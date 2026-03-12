@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -81,7 +81,7 @@ const allSeries: SeriesData[] = [
       { name: 'Africa Teak',  hex: '#7B4F2A', image: IMG.warmTeak },
       { name: 'Jack Wood',    hex: '#4A3020', image: IMG.darkEbony },
       { name: 'Kithul',       hex: '#1C1008', image: IMG.darkEbony },
-      { name: 'Kaluwara',     hex: '#2C2017', image: IMG.darkEbony, slug: 'kaluwara', seriesRoute: '/products/colours/heavy-f/kaluwara' },
+      { name: 'Kaluwara',     hex: '#2C2017', image: IMG.darkEbony },
     ],
   },
   {
@@ -99,9 +99,9 @@ const allSeries: SeriesData[] = [
     desc: 'The B profile joint creates an architectural shadow line between each installed panel, giving installations a sense of depth and dimension that flat panels cannot achieve. Frequently specified by Sri Lankan architects for distinguished living areas, hotel corridors, and premium corporate environments.',
     useCases: ['Living Areas', 'Hotel Corridors', 'Corporate Spaces'],
     colours: [
-      { name: 'Matt White',   hex: '#F5F5F3', image: IMG.pureWhite },
+      { name: 'Matt White',   hex: '#F5F5F3', image: IMG.pureWhite,   slug: 'pearl-white',   seriesRoute: '/products/colours/heavy-b/pearl-white' },
       { name: 'Solid Fabric', hex: '#DDD6C8', image: IMG.lightNatural },
-      { name: 'Silver Line',  hex: '#C0C4C8', image: IMG.greyModern },
+      { name: 'Silver Line',  hex: '#C0C4C8', image: IMG.greyModern,  slug: 'silver-birch',  seriesRoute: '/products/colours/heavy-b/silver-birch' },
       { name: 'Black Line',   hex: '#1A1A1A', image: IMG.darkEbony },
       { name: 'Gold Line',    hex: '#C5A059', image: IMG.goldenWarm },
       { name: 'White Wood',   hex: '#E8D8C0', image: IMG.lightNatural },
@@ -114,11 +114,11 @@ const allSeries: SeriesData[] = [
       { name: 'Teak',         hex: '#7A5030', image: IMG.warmTeak },
       { name: 'Rich Teak',    hex: '#6B4520', image: IMG.warmTeak },
       { name: 'Burma Teak',   hex: '#5C3D1E', image: IMG.warmTeak },
-      { name: 'Africa Teak',  hex: '#7B4F2A', image: IMG.warmTeak, slug: 'africa-teak', seriesRoute: '/products/colours/heavy-b/storm-grey' },
+      { name: 'Africa Teak',  hex: '#7B4F2A', image: IMG.warmTeak },
       { name: 'Jack Wood',    hex: '#4A3020', image: IMG.darkEbony },
       { name: 'Coffee Bean',  hex: '#3A1F0A', image: IMG.darkEbony },
       { name: 'Kithul',       hex: '#1C1008', image: IMG.darkEbony },
-      { name: 'Kaluwara',     hex: '#2C2017', image: IMG.darkEbony, slug: 'kaluwara', seriesRoute: '/products/colours/heavy-b/charcoal-mist' },
+      { name: 'Kaluwara',     hex: '#2C2017', image: IMG.darkEbony },
     ],
   },
   {
@@ -139,7 +139,7 @@ const allSeries: SeriesData[] = [
       { name: 'Africa Teak',  hex: '#7B4F2A', image: IMG.warmTeak },
       { name: 'Danish Teak',  hex: '#8B6040', image: IMG.goldenWarm },
       { name: 'Gray Wood',    hex: '#9A9490', image: IMG.greyModern },
-      { name: 'Kaluwara',     hex: '#2C2017', image: IMG.darkEbony, slug: 'kaluwara', seriesRoute: '/products/colours/heavy-f/kaluwara', badge: 'Popular' },
+      { name: 'Kaluwara',     hex: '#2C2017', image: IMG.darkEbony, badge: 'Popular' },
       { name: 'Maple',        hex: '#C8B080', image: IMG.lightNatural },
       { name: 'White Wash',   hex: '#F0EBE0', image: IMG.pureWhite },
       { name: 'Nadun',        hex: '#B8905A', image: IMG.goldenWarm },
@@ -187,11 +187,11 @@ const allSeries: SeriesData[] = [
     useCases: ['Bathrooms', 'Kitchens', 'Feature Walls'],
     colours: [
       { name: 'Solid Fabric',      hex: '#DDD6C8', image: IMG.lightNatural },
-      { name: 'Pearl Marble',      hex: '#F0ECEA', image: IMG.marble },
-      { name: 'Wooden',            hex: '#A07848', image: IMG.wallWood },
-      { name: 'Grey Marble',       hex: '#C0C0BC', image: IMG.greyModern },
-      { name: 'Sand Wave',         hex: '#D4C4A0', image: IMG.marble },
-      { name: 'Matte Black Marble',hex: '#1A1A1A', image: IMG.darkEbony },
+      { name: 'Pearl Marble',      hex: '#F0ECEA', image: IMG.marble,      slug: 'travertine',       seriesRoute: '/products/colours/wall-cladding/travertine' },
+      { name: 'Wooden',            hex: '#A07848', image: IMG.wallWood,    slug: 'teak-wall',        seriesRoute: '/products/colours/wall-cladding/teak-wall' },
+      { name: 'Grey Marble',       hex: '#C0C0BC', image: IMG.greyModern,  slug: 'stone-wash',       seriesRoute: '/products/colours/wall-cladding/stone-wash' },
+      { name: 'Sand Wave',         hex: '#D4C4A0', image: IMG.marble,      slug: 'lime-wash',        seriesRoute: '/products/colours/wall-cladding/lime-wash' },
+      { name: 'Matte Black Marble',hex: '#1A1A1A', image: IMG.darkEbony,   slug: 'anthracite',       seriesRoute: '/products/colours/wall-cladding/anthracite' },
     ],
   },
 ];
@@ -444,8 +444,6 @@ function SeriesSection({ s, isReversed }: { s: SeriesData; isReversed: boolean }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export function ProductsPage() {
-  const [activeTab, setActiveTab] = useState<string | null>(null);
-
   return (
     <div className="bg-brand-surface min-h-screen text-brand-charcoal font-sans overflow-x-hidden">
       <Navbar />
@@ -670,9 +668,15 @@ export function ProductsPage() {
                 <h2 className="text-4xl md:text-5xl font-serif font-medium text-brand-charcoal tracking-tight mb-4">
                   The Mark of the <span className="italic font-light text-brand-gold-dark">Original.</span>
                 </h2>
-                <p className="text-brand-muted font-light text-sm leading-relaxed mb-8">
+                <p className="text-brand-muted font-light text-sm leading-relaxed mb-6">
                   i-Panel products are frequently imitated. Verify these four markers to confirm you are investing in a genuine original.
                 </p>
+                <Link
+                  to="/our-story"
+                  className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-brand-gold-dark hover:text-brand-charcoal transition-colors border-b border-brand-gold/40 pb-0.5"
+                >
+                  Learn our 15-year story <ArrowRight size={11} />
+                </Link>
               </BlurReveal>
               <BlurReveal delay={0.2}>
                 <div className="overflow-hidden aspect-square border border-black/5 shadow-sm">
