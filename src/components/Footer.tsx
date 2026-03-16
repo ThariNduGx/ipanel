@@ -4,15 +4,15 @@ import { Instagram, Facebook, Linkedin, ArrowUpRight, ArrowRight, Award, MapPin,
 const siteDirectory = {
   brand: [
     { label: 'Home', to: '/' },
-    { label: 'Our Story', to: '/our-story' },
-    { label: 'Inspiration', to: '/inspiration' },
-    { label: 'Dealer Locator', to: '/locate-store' },
+    { label: 'Our Story', to: '/about/our-story' },
+    { label: 'Inspiration', to: '/about' },
+    { label: 'Dealer Locator', to: '/find-a-dealer' },
   ],
   collections: [
-    { label: 'i-Panel LITE', to: '/products/lite' },
-    { label: 'i-Panel HEAVY-B', to: '/products/heavy-b' },
-    { label: 'i-Panel HEAVY-F', to: '/products/heavy-f' },
-    { label: 'Wall Cladding', to: '/products/wall-cladding' },
+    { label: 'i-Panel LITE', to: '/products/ipanel-lite' },
+    { label: 'i-Panel HEAVY-B', to: '/products/ipanel-heavy-b' },
+    { label: 'i-Panel HEAVY-F', to: '/products/architectural-flat' },
+    { label: 'Wall Cladding', to: '/products/wall-cladding-panels' },
     { label: 'All Products', to: '/products' },
   ],
   flagship: [
@@ -23,10 +23,10 @@ const siteDirectory = {
     { label: 'Teak Wall', to: '/products/colours/wall-cladding/teak-wall' },
   ],
   support: [
-    { label: 'Informed Choices (FAQ)', to: '/faq' },
-    { label: 'Technical Quote', to: '/quote' },
-    { label: 'Privacy Policy', to: '/privacy' },
-    { label: 'Terms of Use', to: '/terms' },
+    { label: 'Informed Choices (FAQ)', to: '/resources/faq' },
+    { label: 'Technical Quote', to: '/get-a-quote' },
+    { label: 'Privacy Policy', to: '/privacy-policy' },
+    { label: 'Terms of Use', to: '/terms-and-conditions' },
   ],
 };
 
@@ -217,7 +217,7 @@ export function Footer() {
 
             <div className="mt-6">
               <Link
-                to="/quote"
+                to="/get-a-quote"
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-brand-charcoal text-white text-[11px] uppercase tracking-wider font-bold hover:bg-brand-gold-dark transition-all duration-300"
               >
                 Request a Technical Quote <ArrowRight size={14} />

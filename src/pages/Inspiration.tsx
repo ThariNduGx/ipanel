@@ -254,7 +254,7 @@ export function Inspiration() {
             We actively feature architect-submitted installations in this archive. Accreditation, product links, and project details are included for every featured submission.
           </p>
           <Link
-            to="/quote"
+            to="/get-a-quote"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-brand-charcoal text-[11px] uppercase tracking-wider font-bold hover:bg-brand-gold-dark hover:text-white transition-all duration-300"
           >
             Contact Our Team <ArrowRight size={14} />

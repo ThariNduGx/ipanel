@@ -213,7 +213,7 @@ export function InformedChoices() {
                 <Phone size={15} /> 07 2200 2200
               </a>
               <Link
-                to="/quote"
+                to="/get-a-quote"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-white/20 text-white text-[11px] uppercase tracking-wider font-bold hover:bg-white/10 transition-all duration-300"
               >
                 Send a Technical Enquiry <ArrowRight size={14} />

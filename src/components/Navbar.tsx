@@ -5,36 +5,36 @@ import { useCart } from '../context/CartContext';
 
 const seriesLinks = [
   {
-    label: 'LITE',
-    to: '/products/lite',
-    tagline: 'Wood grain excellence. 12 finishes.',
-    image: '/products/lite.jpg',
-  },
-  {
-    label: 'HEAVY-B',
-    to: '/products/heavy-b',
-    tagline: 'Bevelled precision. Architectural shadow lines.',
-    image: '/products/heavy-b.jpg',
-  },
-  {
-    label: 'HEAVY-F',
-    to: '/products/heavy-f',
-    tagline: 'Pure flat planes. Maximum light diffusion.',
+    label: 'i Series',
+    to: '/products/architectural-flat',
+    tagline: 'Premium flat finish for modern interiors.',
     image: '/products/heavy-flat.jpg',
   },
   {
-    label: 'Wall Cladding',
-    to: '/products/wall-cladding',
-    tagline: 'Vertical stories. Horizontal ambition.',
+    label: 'HEAVY B',
+    to: '/products/ipanel-heavy-b',
+    tagline: 'Enhanced profile design. Elegant ceiling patterns.',
+    image: '/products/heavy-b.jpg',
+  },
+  {
+    label: 'LITE Series',
+    to: '/products/ipanel-lite',
+    tagline: 'Refined simplicity. Trusted performance.',
+    image: '/products/lite.jpg',
+  },
+  {
+    label: 'Finishing Series',
+    to: '/products/finishing-series',
+    tagline: 'The ultimate foundation of luxury.',
     image: '/products/wall.jpg',
   },
 ];
 
 const primaryLinks = [
   { label: 'Home', to: '/' },
-  { label: 'Our Story', to: '/our-story' },
-  { label: 'Inspiration', to: '/inspiration' },
-  { label: 'Locate Store', to: '/locate-store' },
+  { label: 'About', to: '/about' },
+  { label: 'Solutions', to: '/solutions/residential' },
+  { label: 'Dealers', to: '/find-a-dealer' },
   { label: 'Shop', to: '/shop' },
 ];
 
@@ -227,7 +227,7 @@ export function Navbar() {
 
           {/* CTA */}
           <Link
-            to="/quote"
+            to="/get-a-quote"
             className="px-5 py-2.5 rounded-full bg-[#3B82F6] text-white text-[11px] uppercase tracking-wider font-bold hover:bg-[#2563EB] transition-all duration-200 shadow-[0_4px_14px_rgba(59,130,246,0.35)] hover:shadow-[0_4px_20px_rgba(59,130,246,0.5)]"
           >
             Technical Quote
@@ -327,7 +327,7 @@ export function Navbar() {
 
             <div className="pt-2 border-t border-black/5 mt-2">
               <Link
-                to="/quote"
+                to="/get-a-quote"
                 onClick={() => setMenuOpen(false)}
                 className="w-full text-center block px-5 py-3 rounded-full bg-[#3B82F6] text-white text-[11px] uppercase tracking-wider font-bold shadow-[0_4px_14px_rgba(59,130,246,0.3)]"
               >

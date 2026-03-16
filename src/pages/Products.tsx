@@ -428,7 +428,7 @@ function SeriesSection({ s, isReversed }: { s: SeriesData; isReversed: boolean }
                   Explore Full Series <ArrowRight size={13} />
                 </Link>
                 <Link
-                  to="/quote"
+                  to="/get-a-quote"
                   className="px-5 py-3.5 border border-black/10 text-brand-charcoal text-[10px] uppercase tracking-wider font-bold hover:border-brand-gold-dark hover:text-brand-gold-dark transition-all duration-200 font-sans"
                 >
                   Sample
@@ -672,7 +672,7 @@ export function ProductsPage() {
                   i-Panel products are frequently imitated. Verify these four markers to confirm you are investing in a genuine original.
                 </p>
                 <Link
-                  to="/our-story"
+                  to="/about/our-story"
                   className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-brand-gold-dark hover:text-brand-charcoal transition-colors border-b border-brand-gold/40 pb-0.5"
                 >
                   Learn our 15-year story <ArrowRight size={11} />
@@ -829,7 +829,7 @@ export function ProductsPage() {
                         <p className="font-sans font-semibold text-sm">Quick Response Team</p>
                       </div>
                     </a>
-                    <Link to="/locate-store" className="flex items-center gap-4 px-6 py-4 border border-white/15 hover:bg-white hover:text-brand-charcoal transition-all duration-300 group text-white max-w-xs bg-white/10">
+                    <Link to="/find-a-dealer" className="flex items-center gap-4 px-6 py-4 border border-white/15 hover:bg-white hover:text-brand-charcoal transition-all duration-300 group text-white max-w-xs bg-white/10">
                       <MapPin size={17} className="flex-shrink-0" strokeWidth={1.5} />
                       <div>
                         <p className="text-[9px] uppercase tracking-wider font-bold text-white/50 group-hover:text-brand-muted mb-0.5">Showroom</p>
@@ -839,7 +839,7 @@ export function ProductsPage() {
                   </div>
                 </BlurReveal>
                 <BlurReveal delay={0.2}>
-                  <Link to="/quote" className="group relative inline-flex items-center gap-3 px-10 py-4 bg-white text-brand-charcoal text-sm uppercase tracking-widest font-semibold overflow-hidden transition-all hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)] hover:scale-[1.02]">
+                  <Link to="/get-a-quote" className="group relative inline-flex items-center gap-3 px-10 py-4 bg-white text-brand-charcoal text-sm uppercase tracking-widest font-semibold overflow-hidden transition-all hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)] hover:scale-[1.02]">
                     <span className="relative z-10 flex items-center gap-3">
                       Request a Detailed Quotation
                       <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
