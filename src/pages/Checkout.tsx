@@ -107,7 +107,7 @@ export function Checkout() {
 
       const { id } = await res.json();
       clearCart();
-      navigate(`/shop/order-confirmation/${id}`);
+      navigate(`/checkout/confirmation/${id}`);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
@@ -124,7 +124,7 @@ export function Checkout() {
           <p className="font-serif text-2xl text-brand-charcoal">Your cart is empty</p>
           <p className="text-brand-muted text-sm">Add products before proceeding to checkout.</p>
           <Link
-            to="/shop"
+            to="/products"
             className="mt-4 px-6 py-3 rounded-full bg-brand-charcoal text-white text-[11px] uppercase tracking-wider font-bold hover:bg-black transition-colors"
           >
             Browse Products
@@ -142,7 +142,7 @@ export function Checkout() {
       <div className="max-w-6xl mx-auto px-6 pt-28 pb-16">
         {/* Back link */}
         <Link
-          to="/shop"
+          to="/cart"
           className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted hover:text-brand-charcoal transition-colors mb-8"
         >
           <ArrowLeft size={12} />

@@ -70,7 +70,7 @@ const guides: Record<string, GuideData> = {
       { heading: 'What About "Moisture-Resistant" Gypsum?', body: 'Moisture-resistant (MR) gypsum boards have a wax-impregnated core that reduces water absorption to approximately 5% by weight. This is sufficient for low-humidity environments but fails in bathrooms with daily hot showers. MR gypsum is not recommended for wet-area ceiling use in tropical climates.' },
       { heading: 'Installation Tips for Wet-Area Ceilings', body: 'Ensure adequate ventilation (extract fan vented to outside). Use stainless steel or galvanised fixing hardware — standard steel screws will rust and stain. Seal any penetrations (lights, fan outlets) with silicone. i-Panel\'s click-lock profile is self-sealing — no caulking required at panel joints.' },
     ],
-    cta: { label: 'Shop Waterproof Panels', to: '/shop' },
+    cta: { label: 'Shop Waterproof Panels', to: '/products' },
   },
 };
 

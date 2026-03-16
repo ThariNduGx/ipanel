@@ -137,7 +137,7 @@ export function ShopProductDetail() {
   const [added, setAdded] = useState(false);
   const { addItem } = useCart();
 
-  if (!series) return <Navigate to="/shop" replace />;
+  if (!series) return <Navigate to="/products" replace />;
 
   const isFinishing = series.id === 'finishing';
 
@@ -171,9 +171,9 @@ export function ShopProductDetail() {
   const relatedSeries = SERIES.filter((s) => s.id !== series.id);
 
   const seriesPageSlug: Record<string, string> = {
-    'i-series':  'architectural-flat',
-    'heavy-b':   'ipanel-heavy-b',
-    'lite':      'ipanel-lite',
+    'i-series':  'i-series',
+    'heavy-b':   'heavy-b',
+    'lite':      'lite',
     'finishing': 'finishing-series',
   };
 
@@ -188,7 +188,7 @@ export function ShopProductDetail() {
           <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-brand-muted mb-10">
             <Link to="/" className="hover:text-brand-charcoal">Home</Link>
             <ChevronRight size={10} />
-            <Link to="/shop" className="hover:text-brand-charcoal">Shop</Link>
+            <Link to="/products" className="hover:text-brand-charcoal">Products</Link>
             <ChevronRight size={10} />
             <Link to={`/products/${seriesPageSlug[series.id] ?? series.id}`} className="hover:text-brand-charcoal">{series.name}</Link>
             <ChevronRight size={10} />

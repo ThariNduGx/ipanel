@@ -54,7 +54,7 @@ export function CartSidebar() {
                 <span className="text-brand-charcoal font-medium">Browse our collections</span> to get started.
               </p>
               <Link
-                to="/shop"
+                to="/products"
                 onClick={closeCart}
                 className="mt-2 px-6 py-2.5 rounded-full bg-brand-charcoal text-white text-[11px] uppercase tracking-wider font-bold hover:bg-black transition-colors"
               >

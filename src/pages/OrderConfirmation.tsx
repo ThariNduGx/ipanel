@@ -65,7 +65,7 @@ export function OrderConfirmation() {
           <p className="font-serif text-2xl text-brand-charcoal">Order not found</p>
           <p className="text-brand-muted text-sm">{error}</p>
           <Link
-            to="/shop"
+            to="/products"
             className="mt-4 px-6 py-3 rounded-full bg-brand-charcoal text-white text-[11px] uppercase tracking-wider font-bold hover:bg-black transition-colors"
           >
             Back to Shop
@@ -215,7 +215,7 @@ export function OrderConfirmation() {
           className="flex flex-col sm:flex-row gap-3"
         >
           <Link
-            to="/shop"
+            to="/products"
             className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full bg-brand-charcoal text-white text-[11px] uppercase tracking-wider font-bold hover:bg-black transition-colors"
           >
             Continue Shopping

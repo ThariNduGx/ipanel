@@ -114,14 +114,17 @@ export default function App() {
           <Route path="/products/colours" element={<ColoursGallery />} />
           <Route path="/products/compare" element={<ProductCompare />} />
 
-          {/* Series pages — parametric on new URL slugs */}
+          {/* Series pages — v2.1 clean slugs */}
           <Route path="/products/:series" element={<SeriesPage />} />
           {/* Colour detail pages under each series */}
           <Route path="/products/:series/:slug" element={<ColourPage />} />
 
-          {/* Finishing Series has its own hub + profile sub-pages */}
+          {/* Finishing Series — profile-specific hub pages */}
           <Route path="/products/finishing-series" element={<FinishingSeriesPage />} />
           <Route path="/products/finishing-series/:profile" element={<FinishingSeriesPage />} />
+          <Route path="/products/finishing-profile-a" element={<FinishingSeriesPage />} />
+          <Route path="/products/finishing-profile-b" element={<FinishingSeriesPage />} />
+          <Route path="/products/finishing-profile-c" element={<FinishingSeriesPage />} />
 
           {/* ── Solutions ── */}
           <Route path="/solutions/:type" element={<SolutionPage />} />
@@ -139,13 +142,21 @@ export default function App() {
           <Route path="/resources/projects" element={<ProjectsHub />} />
           <Route path="/resources/projects/:slug" element={<ProjectDetail />} />
 
-          {/* ── Shop ── */}
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/shop/cart" element={<ShopCart />} />
-          <Route path="/shop/checkout" element={<Checkout />} />
-          <Route path="/shop/order-confirmation/:id" element={<OrderConfirmation />} />
-          <Route path="/shop/my-account" element={<ShopMyAccount />} />
+          {/* ── Shop (legacy /shop/* kept as redirects) ── */}
+          <Route path="/shop" element={<Navigate to="/products" replace />} />
+          <Route path="/shop/cart" element={<Navigate to="/cart" replace />} />
+          <Route path="/shop/checkout" element={<Navigate to="/checkout" replace />} />
+          <Route path="/shop/order-confirmation/:id" element={<Navigate to="/checkout/confirmation/:id" replace />} />
+          <Route path="/shop/my-account" element={<Navigate to="/account" replace />} />
           <Route path="/shop/product/:sku" element={<ShopProductDetail />} />
+
+          {/* ── Transactional — clean URLs ── */}
+          <Route path="/cart" element={<ShopCart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout/confirmation/:id" element={<OrderConfirmation />} />
+          <Route path="/account" element={<ShopMyAccount />} />
+          <Route path="/account/orders" element={<ShopMyAccount />} />
+          <Route path="/account/certificates" element={<ShopMyAccount />} />
 
           {/* ── Dealers ── */}
           <Route path="/find-a-dealer" element={<FindADealer />} />
@@ -163,11 +174,15 @@ export default function App() {
           <Route path="/faq" element={<Navigate to="/resources/faq" replace />} />
           <Route path="/locate-store" element={<Navigate to="/find-a-dealer" replace />} />
           <Route path="/quote" element={<Navigate to="/get-a-quote" replace />} />
-          <Route path="/checkout" element={<Navigate to="/shop/checkout" replace />} />
-          <Route path="/order-confirmation/:id" element={<Navigate to="/shop/order-confirmation/:id" replace />} />
-          <Route path="/products/lite" element={<Navigate to="/products/ipanel-lite" replace />} />
-          <Route path="/products/heavy-b" element={<Navigate to="/products/ipanel-heavy-b" replace />} />
-          <Route path="/products/heavy-f" element={<Navigate to="/products/architectural-flat" replace />} />
+          <Route path="/order-confirmation/:id" element={<Navigate to="/checkout/confirmation/:id" replace />} />
+          {/* Old product URL slugs → new clean slugs */}
+          <Route path="/products/architectural-flat" element={<Navigate to="/products/i-series" replace />} />
+          <Route path="/products/architectural-flat/:slug" element={<Navigate to="/products/i-series/:slug" replace />} />
+          <Route path="/products/ipanel-heavy-b" element={<Navigate to="/products/heavy-b" replace />} />
+          <Route path="/products/ipanel-heavy-b/:slug" element={<Navigate to="/products/heavy-b/:slug" replace />} />
+          <Route path="/products/ipanel-lite" element={<Navigate to="/products/lite" replace />} />
+          <Route path="/products/ipanel-lite/:slug" element={<Navigate to="/products/lite/:slug" replace />} />
+          <Route path="/products/heavy-f" element={<Navigate to="/products/i-series" replace />} />
           <Route path="/products/wall-cladding" element={<Navigate to="/products/wall-cladding-panels" replace />} />
           <Route path="/products/colours/:series/:slug" element={<Navigate to="/products" replace />} />
 

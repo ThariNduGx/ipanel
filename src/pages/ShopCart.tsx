@@ -20,7 +20,7 @@ export function ShopCart() {
           <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-brand-muted mb-8">
             <Link to="/" className="hover:text-brand-charcoal transition-colors">Home</Link>
             <ChevronRight size={10} />
-            <Link to="/shop" className="hover:text-brand-charcoal transition-colors">Shop</Link>
+            <Link to="/products" className="hover:text-brand-charcoal transition-colors">Shop</Link>
             <ChevronRight size={10} />
             <span className="text-brand-charcoal">Cart</span>
           </nav>
@@ -44,7 +44,7 @@ export function ShopCart() {
               <h2 className="font-serif text-xl text-brand-charcoal mb-2">Your cart is empty</h2>
               <p className="text-brand-muted text-sm mb-8">Browse our panel collections to get started.</p>
               <Link
-                to="/shop"
+                to="/products"
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-brand-charcoal text-white text-[11px] uppercase tracking-[0.15em] font-bold hover:bg-brand-charcoal/90 transition-all"
               >
                 Continue Shopping <ArrowRight size={13} />
@@ -130,13 +130,13 @@ export function ShopCart() {
                     </div>
                   </div>
                   <Link
-                    to="/shop/checkout"
+                    to="/checkout"
                     className="block w-full text-center py-4 rounded-full bg-brand-charcoal text-white text-[11px] uppercase tracking-[0.15em] font-bold hover:bg-brand-charcoal/90 transition-all"
                   >
                     Proceed to Checkout
                   </Link>
                   <Link
-                    to="/shop"
+                    to="/products"
                     className="block w-full text-center py-3 mt-3 text-[11px] uppercase tracking-[0.15em] font-bold text-brand-muted hover:text-brand-charcoal transition-colors"
                   >
                     Continue Shopping
