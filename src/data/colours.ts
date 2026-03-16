@@ -1094,6 +1094,23 @@ export const getColourBySlug = (slug: string): ColourSpec | undefined =>
 export const getColoursBySeriesSlug = (series: ColourSpec['series']): ColourSpec[] =>
   allColours.filter((c) => c.series === series);
 
+/**
+ * Maps new sitemap URL slugs → internal data keys used in colours.ts
+ */
+export const URL_SLUG_TO_DATA_KEY: Record<string, ColourSpec['series']> = {
+  'architectural-flat':   'heavy-f',
+  'ipanel-heavy-b':       'heavy-b',
+  'ipanel-lite':          'lite',
+  'wall-cladding-panels': 'wall-cladding',
+};
+
+export const DATA_KEY_TO_URL_SLUG: Record<string, string> = {
+  'heavy-f':      'architectural-flat',
+  'heavy-b':      'ipanel-heavy-b',
+  'lite':         'ipanel-lite',
+  'wall-cladding':'wall-cladding-panels',
+};
+
 export const seriesData = {
   'lite': {
     label: 'i-Panel LITE',

@@ -251,7 +251,7 @@ export function OurStory() {
               </ul>
               <div className="mt-10">
                 <Link
-                  to="/locate-store"
+                  to="/find-a-dealer"
                   className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-brand-charcoal text-white text-[11px] uppercase tracking-wider font-bold hover:bg-brand-gold-dark transition-all duration-300"
                 >
                   Find an Authorised Dealer <ArrowRight size={14} />

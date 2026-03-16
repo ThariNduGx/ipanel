@@ -4,7 +4,7 @@ import { motion, useInView } from 'motion/react';
 import { ArrowRight, ChevronRight, Shield, Droplets, Sun, Award } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
-import { seriesData, getColoursBySeriesSlug, type ColourSpec } from '../data/colours';
+import { seriesData, getColoursBySeriesSlug, URL_SLUG_TO_DATA_KEY, DATA_KEY_TO_URL_SLUG, type ColourSpec } from '../data/colours';
 
 function BentoColourCard({ colour, index }: { colour: ColourSpec; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -18,7 +18,7 @@ function BentoColourCard({ colour, index }: { colour: ColourSpec; index: number 
       transition={{ duration: 0.55, delay: (index % 4) * 0.08, ease: [0.22, 1, 0.36, 1] }}
     >
       <Link
-        to={`/products/colours/${colour.series}/${colour.slug}`}
+        to={`/products/${DATA_KEY_TO_URL_SLUG[colour.series] ?? colour.series}/${colour.slug}`}
         className="group block relative overflow-hidden rounded-2xl aspect-[3/4] bg-brand-surface border border-black/5 hover:border-brand-gold-dark/30 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.12)] hover:-translate-y-1"
       >
         {/* Colour Preview */}
@@ -64,9 +64,10 @@ function BentoColourCard({ colour, index }: { colour: ColourSpec; index: number 
 
 export function SeriesPage() {
   const { series } = useParams<{ series: string }>();
-  const seriesKey = series as keyof typeof seriesData;
-  const data = seriesData[seriesKey];
-  const colours = getColoursBySeriesSlug(seriesKey as ColourSpec['series']);
+  // Map new sitemap URL slug to internal data key (fall back to slug itself for old URLs)
+  const dataKey = (series ? (URL_SLUG_TO_DATA_KEY[series] ?? series) : series) as keyof typeof seriesData;
+  const data = seriesData[dataKey];
+  const colours = getColoursBySeriesSlug(dataKey as ColourSpec['series']);
 
   useEffect(() => { window.scrollTo(0, 0); }, [series]);
 
@@ -75,7 +76,7 @@ export function SeriesPage() {
   const performanceTable = [
     { spec: 'Panel Thickness', value: data.thickness, note: 'Engineered for rigidity and acoustic mass' },
     { spec: 'Profile Width', value: data.width, note: 'Optimised for installation efficiency' },
-    { spec: 'Standard Lengths', value: series === 'heavy-f' ? '3000mm / 4000mm / 6000mm' : '3000mm / 4000mm', note: 'Cut-to-length available' },
+    { spec: 'Standard Lengths', value: dataKey === 'heavy-f' ? '3000mm / 4000mm / 6000mm' : '3000mm / 4000mm', note: 'Cut-to-length available' },
     { spec: 'Colour Range', value: `${data.colours} Finishes`, note: 'UV-stabilised, no fading in 12 years' },
     { spec: 'Warranty', value: data.warranty, note: 'Manufacturer backed, transferable' },
     { spec: 'Fire Rating', value: 'Class B Fire Retardant', note: 'ASTM E84 compliant' },
@@ -162,7 +163,7 @@ export function SeriesPage() {
               Explore {data.colours} Colours
             </a>
             <Link
-              to="/quote"
+              to="/get-a-quote"
               className="px-7 py-3.5 rounded-full border border-white/30 text-white text-[11px] uppercase tracking-wider font-bold hover:bg-white/10 transition-all duration-300"
             >
               Request Samples
@@ -284,13 +285,13 @@ export function SeriesPage() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
-              to="/quote"
+              to="/get-a-quote"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-brand-charcoal text-white text-[11px] uppercase tracking-wider font-bold hover:bg-brand-gold-dark transition-all duration-300"
             >
               Request a Technical Quote <ArrowRight size={15} />
             </Link>
             <Link
-              to="/locate-store"
+              to="/find-a-dealer"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-brand-charcoal/20 text-brand-charcoal text-[11px] uppercase tracking-wider font-bold hover:border-brand-gold-dark hover:text-brand-gold-dark transition-all duration-300"
             >
               Find an Authorised Dealer
@@ -304,11 +305,11 @@ export function SeriesPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               {Object.entries(seriesData)
-                .filter(([key]) => key !== series)
+                .filter(([key]) => key !== dataKey)
                 .map(([key, s]) => (
                   <Link
                     key={key}
-                    to={`/products/${key}`}
+                    to={`/products/${DATA_KEY_TO_URL_SLUG[key] ?? key}`}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-black/10 text-[11px] uppercase tracking-wider font-bold font-sans text-brand-muted hover:border-brand-charcoal hover:text-brand-charcoal transition-all duration-200"
                   >
                     {s.label} <ArrowRight size={12} />

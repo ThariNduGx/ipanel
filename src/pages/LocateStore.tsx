@@ -304,7 +304,7 @@ export function LocateStore() {
             We are actively expanding our authorised dealer network in underserved regions. Approved dealers receive full product training, display board provision, and inclusion in this directory.
           </p>
           <Link
-            to="/quote"
+            to="/get-a-quote"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-brand-charcoal text-[11px] uppercase tracking-wider font-bold hover:bg-brand-gold-dark hover:text-white transition-all duration-300"
           >
             Dealer Enquiry <ArrowRight size={14} />

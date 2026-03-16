@@ -4,7 +4,7 @@ import { motion, useInView } from 'motion/react';
 import { ArrowRight, ChevronRight, Shield, Droplets, Sun, Layers, Award } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
-import { getColourBySlug, getColoursBySeriesSlug } from '../data/colours';
+import { getColourBySlug, getColoursBySeriesSlug, URL_SLUG_TO_DATA_KEY, DATA_KEY_TO_URL_SLUG } from '../data/colours';
 
 function ProfileCard({ profile, colourName, index }: { profile: { id: string; label: string; name: string; description: string; image: string }; colourName: string; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -77,7 +77,7 @@ function CoordinatingCard({ slug, series, index }: { slug: string; series: strin
       transition={{ duration: 0.5, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
     >
       <Link
-        to={`/products/colours/${colour.series}/${colour.slug}`}
+        to={`/products/${DATA_KEY_TO_URL_SLUG[colour.series] ?? colour.series}/${colour.slug}`}
         className="group relative overflow-hidden rounded-2xl block aspect-[4/5] hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-500 border border-black/5"
       >
         <div className="absolute inset-0" style={{ backgroundColor: colour.thumbnailBg }} />
@@ -119,16 +119,18 @@ function SpecRow({ label, value, delay }: { label: string; value: string; delay:
 
 export function ColourPage() {
   const { series, slug } = useParams<{ series: string; slug: string }>();
+  // Map new URL slug to internal data key (e.g. 'architectural-flat' → 'heavy-f')
+  const dataKey = series ? (URL_SLUG_TO_DATA_KEY[series] ?? series) : 'lite';
   const colour = getColourBySlug(slug || '');
-  const seriesColours = getColoursBySeriesSlug((series as any) || 'lite');
+  const seriesColours = getColoursBySeriesSlug(dataKey as any);
 
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
 
-  if (!colour || colour.series !== series) {
-    return <Navigate to={`/products/${series || 'lite'}`} replace />;
+  if (!colour || colour.series !== dataKey) {
+    return <Navigate to={`/products/${series ?? 'ipanel-lite'}`} replace />;
   }
 
-  const seriesPath = `/products/${colour.series}`;
+  const seriesPath = `/products/${DATA_KEY_TO_URL_SLUG[colour.series] ?? colour.series}`;
 
   // Other colours in the same series (excluding current)
   const otherColours = seriesColours.filter((c) => c.slug !== colour.slug).slice(0, 4);
@@ -197,7 +199,7 @@ export function ColourPage() {
                 ))}
               </div>
               <Link
-                to="/quote"
+                to="/get-a-quote"
                 className="px-5 py-2.5 rounded-full bg-white text-brand-charcoal text-[10px] uppercase tracking-wider font-bold hover:bg-brand-gold-dark hover:text-white transition-all duration-300"
               >
                 Request Sample
@@ -226,7 +228,7 @@ export function ColourPage() {
 
               <div className="mt-10 flex gap-3 flex-wrap">
                 <Link
-                  to="/quote"
+                  to="/get-a-quote"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand-charcoal text-white text-[10px] uppercase tracking-wider font-bold hover:bg-brand-gold-dark transition-all duration-300"
                 >
                   Order Sample <ArrowRight size={13} />
@@ -368,13 +370,13 @@ export function ColourPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              to="/quote"
+              to="/get-a-quote"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-brand-charcoal text-white text-[11px] uppercase tracking-wider font-bold hover:bg-brand-gold-dark transition-all duration-300"
             >
               Technical Quote <ArrowRight size={14} />
             </Link>
             <Link
-              to="/locate-store"
+              to="/find-a-dealer"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-brand-charcoal/20 text-brand-charcoal text-[11px] uppercase tracking-wider font-bold hover:border-brand-charcoal transition-all duration-300"
             >
               Find a Dealer

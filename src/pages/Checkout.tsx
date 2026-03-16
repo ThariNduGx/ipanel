@@ -107,7 +107,7 @@ export function Checkout() {
 
       const { id } = await res.json();
       clearCart();
-      navigate(`/order-confirmation/${id}`);
+      navigate(`/shop/order-confirmation/${id}`);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
