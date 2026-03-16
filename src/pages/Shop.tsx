@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { X, Plus, Minus, ShoppingBag, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Navbar } from '../components/Navbar';
@@ -24,6 +25,21 @@ interface ConfigState {
   selectedLength: LengthOption;
   selectedProfile?: ProfileOption;
   quantity: number;
+}
+
+const SKU_PREFIX: Record<string, string> = {
+  'i-series':  'arch-flat',
+  'heavy-b':   'designer-heavy',
+  'lite':      'project-lite',
+};
+
+function toSlug(name: string) {
+  return name.toLowerCase().replace(/\s+/g, '-');
+}
+
+function buildSku(series: SeriesSpec, colorName: string): string {
+  if (series.id === 'finishing') return `finishing-${toSlug(colorName)}`;
+  return `${SKU_PREFIX[series.id] ?? series.id}-${toSlug(colorName)}`;
 }
 
 function ProductConfigModal({
@@ -66,13 +82,7 @@ function ProductConfigModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 sm:p-6">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -101,12 +111,9 @@ function ProductConfigModal({
 
         {/* Config body */}
         <div className="p-5 space-y-5">
-          {/* Length selector */}
           {config.series.lengths.length > 1 && (
             <div>
-              <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-2">
-                Length
-              </p>
+              <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-2">Length</p>
               <div className="flex gap-2">
                 {config.series.lengths.map((l) => (
                   <button
@@ -125,12 +132,9 @@ function ProductConfigModal({
             </div>
           )}
 
-          {/* Profile selector (Finishing Series) */}
           {config.series.profiles && (
             <div>
-              <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-2">
-                Profile
-              </p>
+              <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-2">Profile</p>
               <div className="flex gap-2">
                 {config.series.profiles.map((p) => (
                   <button
@@ -152,12 +156,9 @@ function ProductConfigModal({
             </div>
           )}
 
-          {/* Quantity */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-0.5">
-                Quantity (pieces)
-              </p>
+              <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-0.5">Quantity (pieces)</p>
               <div className="flex items-center gap-3 mt-2">
                 <button
                   onClick={() => setQty(Math.max(1, qty - 1))}
@@ -165,9 +166,7 @@ function ProductConfigModal({
                 >
                   <Minus size={12} />
                 </button>
-                <span className="text-lg font-bold text-brand-charcoal w-8 text-center">
-                  {qty}
-                </span>
+                <span className="text-lg font-bold text-brand-charcoal w-8 text-center">{qty}</span>
                 <button
                   onClick={() => setQty(qty + 1)}
                   className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center hover:bg-brand-charcoal hover:text-white hover:border-brand-charcoal transition-all text-brand-charcoal"
@@ -176,21 +175,13 @@ function ProductConfigModal({
                 </button>
               </div>
             </div>
-
             <div className="text-right">
-              <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-0.5">
-                Total
-              </p>
-              <p className="font-serif text-2xl font-medium text-brand-charcoal">
-                {formatPrice(totalPrice)}
-              </p>
-              <p className="text-[10px] text-brand-muted">
-                {formatPrice(pricePerPiece)}/piece
-              </p>
+              <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-0.5">Total</p>
+              <p className="font-serif text-2xl font-medium text-brand-charcoal">{formatPrice(totalPrice)}</p>
+              <p className="text-[10px] text-brand-muted">{formatPrice(pricePerPiece)}/piece</p>
             </div>
           </div>
 
-          {/* Specs */}
           <div className="grid grid-cols-3 gap-2 py-3 border-t border-b border-black/5">
             {[
               { label: 'Width', value: config.series.width },
@@ -198,36 +189,32 @@ function ProductConfigModal({
               { label: 'Warranty', value: config.series.warranty },
             ].map((s) => (
               <div key={s.label} className="text-center">
-                <p className="text-[9px] uppercase tracking-[0.12em] font-bold text-brand-muted">
-                  {s.label}
-                </p>
+                <p className="text-[9px] uppercase tracking-[0.12em] font-bold text-brand-muted">{s.label}</p>
                 <p className="text-[11px] font-bold text-brand-charcoal mt-0.5">{s.value}</p>
               </div>
             ))}
           </div>
 
-          {/* Add to Cart */}
-          <button
-            onClick={handleAdd}
-            disabled={added}
-            className={`w-full py-3.5 rounded-full text-[11px] uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-2 ${
-              added
-                ? 'bg-green-500 text-white'
-                : 'bg-brand-charcoal text-white hover:bg-black shadow-[0_4px_20px_rgba(0,0,0,0.15)]'
-            }`}
-          >
-            {added ? (
-              <>
-                <Check size={14} />
-                Added to Cart
-              </>
-            ) : (
-              <>
-                <ShoppingBag size={14} />
-                Add to Cart
-              </>
-            )}
-          </button>
+          <div className="flex gap-2">
+            <Link
+              to={`/shop/product/${buildSku(config.series, config.colorName)}`}
+              onClick={onClose}
+              className="flex-1 py-3 rounded-full border border-black/10 text-brand-charcoal text-[10px] uppercase tracking-wider font-bold hover:border-brand-charcoal/30 transition-all text-center"
+            >
+              Full Details
+            </Link>
+            <button
+              onClick={handleAdd}
+              disabled={added}
+              className={`flex-1 py-3 rounded-full text-[10px] uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1.5 ${
+                added
+                  ? 'bg-green-500 text-white'
+                  : 'bg-brand-charcoal text-white hover:bg-black'
+              }`}
+            >
+              {added ? <><Check size={13} /> Added</> : <><ShoppingBag size={13} /> Add to Cart</>}
+            </button>
+          </div>
         </div>
       </motion.div>
     </div>
@@ -237,57 +224,55 @@ function ProductConfigModal({
 function ProductCard({
   series,
   colorName,
-  onConfigure,
+  sku,
+  swatch,
+  onQuickAdd,
 }: {
   series: SeriesSpec;
   colorName: string;
-  onConfigure: () => void;
+  sku: string;
+  swatch: string;
+  onQuickAdd: () => void;
 }) {
-  const swatch = COLOR_SWATCHES[colorName] ?? '#ccc';
-  const minPrice = Math.min(...Object.values(series.prices).filter(Boolean) as number[]);
+  const minPrice = Math.min(...(Object.values(series.prices).filter(Boolean) as number[]));
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="group bg-white rounded-2xl overflow-hidden border border-black/5 hover:border-black/10 hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer"
-      onClick={onConfigure}
+      className="group relative"
     >
-      {/* Swatch */}
-      <div
-        className="h-40 w-full transition-transform duration-500 group-hover:scale-[1.02] origin-bottom"
-        style={{ backgroundColor: swatch }}
-      />
+      <Link
+        to={`/shop/product/${sku}`}
+        className="block bg-white rounded-2xl overflow-hidden border border-black/5 hover:border-black/10 hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] transition-all duration-300"
+      >
+        {/* Swatch */}
+        <div
+          className="h-40 w-full transition-transform duration-500 group-hover:scale-[1.02] origin-bottom"
+          style={{ backgroundColor: swatch }}
+        />
 
-      {/* Info */}
-      <div className="p-4">
-        <div className="flex items-start justify-between gap-2 mb-3">
-          <div>
-            <p className="text-[9px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-0.5">
-              {series.name}
-            </p>
-            <p className="font-serif text-sm font-medium text-brand-charcoal leading-tight">
-              {colorName}
-            </p>
+        {/* Info */}
+        <div className="p-4">
+          <p className="text-[9px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-0.5">{series.name}</p>
+          <p className="font-serif text-sm font-medium text-brand-charcoal leading-tight">{colorName}</p>
+          <div className="flex items-center justify-between mt-3">
+            <div>
+              <p className="text-[9px] text-brand-muted">From</p>
+              <p className="text-xs font-bold text-brand-charcoal">{formatPrice(minPrice)}</p>
+            </div>
+            <span className="text-[9px] bg-brand-surface px-2 py-0.5 rounded-full font-bold text-brand-muted">{series.warranty}</span>
           </div>
-          <span className="text-[9px] bg-brand-surface px-2 py-0.5 rounded-full font-bold text-brand-muted whitespace-nowrap flex-shrink-0">
-            {series.warranty}
-          </span>
         </div>
+      </Link>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[9px] text-brand-muted">From</p>
-            <p className="text-xs font-bold text-brand-charcoal">{formatPrice(minPrice)}</p>
-          </div>
-          <button
-            className="px-3 py-1.5 rounded-full bg-brand-charcoal text-white text-[9px] uppercase tracking-wider font-bold hover:bg-black transition-colors opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200"
-            onClick={(e) => { e.stopPropagation(); onConfigure(); }}
-          >
-            Add to Cart
-          </button>
-        </div>
-      </div>
+      {/* Quick Add — floats above the Link */}
+      <button
+        onClick={(e) => { e.preventDefault(); onQuickAdd(); }}
+        className="absolute bottom-[52px] right-3 px-3 py-1.5 rounded-full bg-brand-charcoal text-white text-[9px] uppercase tracking-wider font-bold opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200 shadow-lg"
+      >
+        Quick Add
+      </button>
     </motion.div>
   );
 }
@@ -302,12 +287,15 @@ export function Shop() {
 
   const filteredProducts = SERIES.flatMap((series) => {
     if (activeSeries !== 'all' && series.id !== activeSeries) return [];
+
     return series.colors
-      .filter((color) => {
-        if (activeCategory === 'All') return true;
-        return COLOR_CATEGORIES[color] === activeCategory;
-      })
-      .map((color) => ({ series, color }));
+      .filter((color) => activeCategory === 'All' || COLOR_CATEGORIES[color] === activeCategory)
+      .map((color) => ({
+        series,
+        color,
+        sku: buildSku(series, color),
+        swatch: COLOR_SWATCHES[color] ?? '#ccc',
+      }));
   });
 
   function openConfig(series: SeriesSpec, colorName: string) {
@@ -327,14 +315,8 @@ export function Shop() {
 
       {/* Hero */}
       <section className="pt-32 pb-12 px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-        >
-          <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-brand-gold mb-3">
-            i-Panel Collections
-          </p>
+        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+          <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-brand-gold mb-3">i-Panel Collections</p>
           <h1 className="font-serif text-4xl md:text-5xl font-medium text-brand-charcoal mb-4 leading-tight">
             Shop All Products
           </h1>
@@ -347,27 +329,23 @@ export function Shop() {
       {/* Filters */}
       <div className="sticky top-16 md:top-20 z-30 bg-brand-surface/90 backdrop-blur-xl border-b border-black/5 px-6 py-3">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-          {/* Series tabs */}
           <div className="flex gap-1.5 flex-wrap">
-            {[{ id: 'all', name: 'All Series' }, ...SERIES.map((s) => ({ id: s.id, name: s.name }))].map(
-              (s) => (
-                <button
-                  key={s.id}
-                  onClick={() => setActiveSeries(s.id)}
-                  className={`px-3.5 py-1.5 rounded-full text-[10px] uppercase tracking-[0.12em] font-bold transition-all ${
-                    activeSeries === s.id
-                      ? 'bg-brand-charcoal text-white'
-                      : 'bg-white text-brand-muted hover:text-brand-charcoal border border-black/8 hover:border-black/15'
-                  }`}
-                >
-                  {s.name}
-                </button>
-              )
-            )}
+            {[{ id: 'all', name: 'All Series' }, ...SERIES.map((s) => ({ id: s.id, name: s.name }))].map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setActiveSeries(s.id)}
+                className={`px-3.5 py-1.5 rounded-full text-[10px] uppercase tracking-[0.12em] font-bold transition-all ${
+                  activeSeries === s.id
+                    ? 'bg-brand-charcoal text-white'
+                    : 'bg-white text-brand-muted hover:text-brand-charcoal border border-black/8 hover:border-black/15'
+                }`}
+              >
+                {s.name}
+              </button>
+            ))}
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Category filter */}
             <div className="flex gap-1">
               {categories.map((cat) => (
                 <button
@@ -384,7 +362,6 @@ export function Shop() {
               ))}
             </div>
 
-            {/* Cart button */}
             <button
               onClick={openCart}
               className="relative flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-black/8 hover:border-black/15 transition-all text-brand-charcoal"
@@ -392,7 +369,7 @@ export function Shop() {
               <ShoppingBag size={14} />
               <span className="text-[10px] font-bold uppercase tracking-wider">Cart</span>
               {itemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-brand-charcoal text-white text-[9px] font-bold rounded-full w-4.5 h-4.5 flex items-center justify-center min-w-[18px] min-h-[18px]">
+                <span className="absolute -top-1.5 -right-1.5 bg-brand-charcoal text-white text-[9px] font-bold rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center px-1">
                   {itemCount}
                 </span>
               )}
@@ -413,12 +390,14 @@ export function Shop() {
               {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {filteredProducts.map(({ series, color }) => (
+              {filteredProducts.map(({ series, color, sku, swatch }) => (
                 <ProductCard
                   key={`${series.id}-${color}`}
                   series={series}
                   colorName={color}
-                  onConfigure={() => openConfig(series, color)}
+                  sku={sku}
+                  swatch={swatch}
+                  onQuickAdd={() => openConfig(series, color)}
                 />
               ))}
             </div>
@@ -426,7 +405,7 @@ export function Shop() {
         )}
       </main>
 
-      {/* Config Modal */}
+      {/* Quick-Add Modal */}
       <AnimatePresence>
         {configTarget && (
           <ProductConfigModal

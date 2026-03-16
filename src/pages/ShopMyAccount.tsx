@@ -138,7 +138,7 @@ export function ShopMyAccount() {
 
               <div className="mt-6 pt-6 border-t border-black/5 text-center">
                 <p className="text-[11px] text-brand-muted">
-                  Or <Link to="/shop" className="font-bold text-brand-charcoal hover:underline">continue as guest</Link> — account not required to purchase.
+                  Or <Link to="/products" className="font-bold text-brand-charcoal hover:underline">continue as guest</Link> — account not required to purchase.
                 </p>
               </div>
             </div>

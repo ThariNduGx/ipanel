@@ -6,19 +6,19 @@ import { useCart } from '../context/CartContext';
 const seriesLinks = [
   {
     label: 'i Series',
-    to: '/products/architectural-flat',
+    to: '/products/i-series',
     tagline: 'Premium flat finish for modern interiors.',
     image: '/products/heavy-flat.jpg',
   },
   {
     label: 'HEAVY B',
-    to: '/products/ipanel-heavy-b',
+    to: '/products/heavy-b',
     tagline: 'Enhanced profile design. Elegant ceiling patterns.',
     image: '/products/heavy-b.jpg',
   },
   {
     label: 'LITE Series',
-    to: '/products/ipanel-lite',
+    to: '/products/lite',
     tagline: 'Refined simplicity. Trusted performance.',
     image: '/products/lite.jpg',
   },
@@ -35,7 +35,7 @@ const primaryLinks = [
   { label: 'About', to: '/about' },
   { label: 'Solutions', to: '/solutions/residential' },
   { label: 'Dealers', to: '/find-a-dealer' },
-  { label: 'Shop', to: '/shop' },
+  { label: 'Shop', to: '/products' },
 ];
 
 export function Navbar() {

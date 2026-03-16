@@ -190,7 +190,7 @@ export function CeilingCalculator() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
-                  to="/shop"
+                  to="/products"
                   className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full bg-white text-brand-charcoal text-[11px] uppercase tracking-[0.15em] font-bold hover:bg-white/90 transition-all"
                 >
                   <ShoppingBag size={14} />

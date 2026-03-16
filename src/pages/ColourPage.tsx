@@ -1,10 +1,20 @@
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'motion/react';
-import { ArrowRight, ChevronRight, Shield, Droplets, Sun, Layers, Award } from 'lucide-react';
+import { ArrowRight, ChevronRight, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
+import { CartSidebar } from '../components/CartSidebar';
+import { useCart } from '../context/CartContext';
 import { getColourBySlug, getColoursBySeriesSlug, URL_SLUG_TO_DATA_KEY, DATA_KEY_TO_URL_SLUG } from '../data/colours';
+import { SERIES, COLOR_SWATCHES, LengthOption, formatPrice } from '../data/shopProducts';
+
+/** Maps colours.ts internal keys → shopProducts.ts series ids */
+const DATA_KEY_TO_SERIES_ID: Record<string, string> = {
+  'lite':    'lite',
+  'heavy-b': 'heavy-b',
+  'heavy-f': 'i-series',
+};
 
 function ProfileCard({ profile, colourName, index }: { profile: { id: string; label: string; name: string; description: string; image: string }; colourName: string; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -119,10 +129,38 @@ function SpecRow({ label, value, delay }: { label: string; value: string; delay:
 
 export function ColourPage() {
   const { series, slug } = useParams<{ series: string; slug: string }>();
-  // Map new URL slug to internal data key (e.g. 'architectural-flat' → 'heavy-f')
+  // Map new URL slug to internal data key (e.g. 'i-series' → 'heavy-f')
   const dataKey = series ? (URL_SLUG_TO_DATA_KEY[series] ?? series) : 'lite';
   const colour = getColourBySlug(slug || '');
   const seriesColours = getColoursBySeriesSlug(dataKey as any);
+
+  // ── Cart / purchase state ──
+  const { addItem } = useCart();
+  const shopSeries = SERIES.find((s) => s.id === (DATA_KEY_TO_SERIES_ID[dataKey] ?? dataKey));
+  const [selectedLength, setSelectedLength] = useState<LengthOption>(
+    shopSeries?.lengths[0]?.cm ?? '305'
+  );
+  const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
+
+  function handleAddToCart() {
+    if (!shopSeries || !colour) return;
+    const swatchHex = COLOR_SWATCHES[colour.name] ?? '#C8C8C8';
+    const price = shopSeries.prices[selectedLength] ?? 0;
+    addItem({
+      cartKey: `${shopSeries.id}-${colour.name}-${selectedLength}`,
+      seriesId: shopSeries.id,
+      seriesName: shopSeries.name,
+      colorName: colour.name,
+      colorSwatch: swatchHex,
+      selectedLength,
+      lengthLabel: shopSeries.lengths.find((l) => l.cm === selectedLength)?.label ?? `${selectedLength}cm`,
+      quantity,
+      pricePerPiece: price,
+    });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2500);
+  }
 
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
 
@@ -135,9 +173,12 @@ export function ColourPage() {
   // Other colours in the same series (excluding current)
   const otherColours = seriesColours.filter((c) => c.slug !== colour.slug).slice(0, 4);
 
+  const price = shopSeries ? (shopSeries.prices[selectedLength] ?? 0) : 0;
+
   return (
     <div className="min-h-screen bg-brand-surface">
       <Navbar />
+      <CartSidebar />
 
       {/* Hero */}
       <section className="relative h-[90vh] min-h-[650px] flex items-end pb-0 overflow-hidden">
@@ -280,6 +321,113 @@ export function ColourPage() {
           </div>
         </div>
       </section>
+
+      {/* ── Purchase Widget (shown when shopProducts data exists for this series) ── */}
+      {shopSeries && (
+        <section className="py-16 px-6 border-t border-black/5 bg-white">
+          <div className="container mx-auto max-w-6xl">
+            <div className="grid md:grid-cols-2 gap-10 items-center">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-gold-dark font-sans mb-3">
+                  Order Panels
+                </p>
+                <h2 className="text-3xl font-serif font-medium text-brand-charcoal mb-2">
+                  {colour.name}
+                </h2>
+                <p className="text-brand-muted text-sm mb-6">{shopSeries.subtitle}</p>
+                <div className="flex items-end gap-4 mb-6">
+                  <div>
+                    <p className="font-serif text-4xl text-brand-charcoal">{formatPrice(price)}</p>
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-brand-muted mt-1">
+                      Per panel · {shopSeries.lengths.find((l) => l.cm === selectedLength)?.label}
+                    </p>
+                  </div>
+                  <span className="text-[9px] bg-brand-surface px-3 py-1 rounded-full font-bold text-brand-muted">
+                    {shopSeries.warranty} Warranty
+                  </span>
+                </div>
+
+                {/* Length selector */}
+                {shopSeries.lengths.length > 1 && (
+                  <div className="mb-5">
+                    <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-2">Length</p>
+                    <div className="flex gap-2">
+                      {shopSeries.lengths.map((l) => (
+                        <button
+                          key={l.cm}
+                          onClick={() => setSelectedLength(l.cm)}
+                          className={`flex-1 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all ${
+                            selectedLength === l.cm
+                              ? 'bg-brand-charcoal text-white border-brand-charcoal'
+                              : 'border-black/10 text-brand-muted hover:border-brand-charcoal/30 hover:text-brand-charcoal'
+                          }`}
+                        >
+                          {l.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Quantity + Add to Cart */}
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="flex items-center gap-2 bg-brand-surface rounded-full px-3 py-2">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-brand-muted hover:text-brand-charcoal transition-colors"
+                    >
+                      <Minus size={12} />
+                    </button>
+                    <span className="w-8 text-center font-bold text-brand-charcoal">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-brand-muted hover:text-brand-charcoal transition-colors"
+                    >
+                      <Plus size={12} />
+                    </button>
+                  </div>
+                  <span className="text-sm text-brand-muted font-sans">{formatPrice(price * quantity)} total</span>
+                </div>
+
+                <button
+                  onClick={handleAddToCart}
+                  className={`w-full flex items-center justify-center gap-2 py-4 rounded-full text-[11px] uppercase tracking-[0.15em] font-bold transition-all mb-3 ${
+                    added
+                      ? 'bg-green-600 text-white'
+                      : 'bg-brand-charcoal text-white hover:bg-brand-charcoal/90 shadow-[0_4px_20px_rgba(0,0,0,0.12)]'
+                  }`}
+                >
+                  {added ? <><Check size={15} /> Added to Cart</> : <><ShoppingBag size={15} /> Add to Cart</>}
+                </button>
+                <Link
+                  to="/get-a-quote"
+                  className="block w-full text-center py-3.5 rounded-full border border-black/10 text-brand-charcoal text-[11px] uppercase tracking-[0.15em] font-bold hover:border-brand-charcoal/30 transition-all"
+                >
+                  Request a Quote Instead
+                </Link>
+              </div>
+
+              {/* Trust badges */}
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { icon: Shield, label: shopSeries.warranty + ' Warranty' },
+                  { icon: Droplets, label: '100% Waterproof' },
+                  { icon: Sun, label: 'UV-Stabilised' },
+                  { icon: Layers, label: colour.techSpecs.thickness + ' Thick' },
+                ].map((b) => {
+                  const Icon = b.icon;
+                  return (
+                    <div key={b.label} className="bg-brand-surface rounded-2xl p-5 border border-black/5 text-center">
+                      <Icon size={20} className="mx-auto mb-2 text-brand-charcoal" strokeWidth={1.5} />
+                      <p className="text-[10px] uppercase tracking-[0.1em] font-bold text-brand-muted leading-snug">{b.label}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Interior Coordination Bento */}
       <section className="py-24 px-6 bg-brand-charcoal text-white">
