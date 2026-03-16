@@ -144,7 +144,7 @@ function ProductConfigModal({
                   >
                     <span>{p.name}</span>
                     <span className={`block text-[9px] font-normal mt-0.5 ${profile === p.id ? 'text-white/70' : 'text-brand-muted'}`}>
-                      {p.inch}
+                      {p.shape}
                     </span>
                   </button>
                 ))}

@@ -51,7 +51,8 @@ export const COLOR_CATEGORIES: Record<string, ColorCategory> = {
   'Kaluwara':     'Woods',
 };
 
-export type LengthOption = '305' | '366';
+/** Available panel lengths in cm */
+export type LengthOption = '122' | '305' | '366';
 export type ProfileOption = 'A' | 'B' | 'C';
 
 export interface LengthSpec {
@@ -62,12 +63,14 @@ export interface LengthSpec {
 export interface ProfileSpec {
   id: ProfileOption;
   name: string;
-  inch: string;
+  /** Profile dimension ratio, e.g. "4\":4\"" */
+  shape: string;
 }
 
 export interface SeriesSpec {
   id: string;
   name: string;
+  subtitle: string;
   tagline: string;
   warranty: string;
   width: string;
@@ -84,18 +87,19 @@ export const SERIES: SeriesSpec[] = [
   {
     id: 'finishing',
     name: 'Finishing Series',
-    tagline: 'Highest warranty. Finest profile detail.',
+    subtitle: 'The Ultimate Foundation of Luxury',
+    tagline: '15-year warranty. Three distinct profile shapes.',
     warranty: '15 Years',
-    width: '10 cm',
-    thickness: '7.5 mm',
-    weight: '0.09 Kg/Lft',
-    lengths: [{ cm: '305', label: '305 cm (10 ft)' }],
+    width: '10 cm (±5 mm)',
+    thickness: '7.5 mm (±0.2 mm)',
+    weight: '0.09 Kg/Lft (±0.05 kg)',
+    lengths: [{ cm: '122', label: '122 cm (4 ft)' }],
     profiles: [
-      { id: 'A', name: 'Profile A', inch: '4 inch' },
-      { id: 'B', name: 'Profile B', inch: '2 inch' },
-      { id: 'C', name: 'Profile C', inch: '3 inch' },
+      { id: 'A', name: 'Profile A', shape: '4" : 4"' },
+      { id: 'B', name: 'Profile B', shape: '2" : 2"' },
+      { id: 'C', name: 'Profile C', shape: '3" : 1"' },
     ],
-    prices: { '305': 3500 },
+    prices: { '122': 1400 },
     colors: [
       'Matt White', 'Solid Fabric', 'Silver Line', 'Black Line',
       'Gold Line', 'White Wood', 'Gray Wood', 'Pine Wood',
@@ -107,11 +111,12 @@ export const SERIES: SeriesSpec[] = [
   {
     id: 'lite',
     name: 'LITE Series',
-    tagline: 'Wider panels. Faster coverage.',
+    subtitle: 'Refined Simplicity, Trusted Performance',
+    tagline: 'Project-focused. Wider panels, faster coverage.',
     warranty: '5 Years',
-    width: '30 cm',
-    thickness: '7.5 mm',
-    weight: '0.270 Kg/Lft',
+    width: '12 in (±5 mm)',
+    thickness: '7.5 mm (±0.2 mm)',
+    weight: '0.220 Kg/Lft (±0.1 kg)',
     lengths: [
       { cm: '305', label: '305 cm (10 ft)' },
       { cm: '366', label: '366 cm (12 ft)' },
@@ -127,11 +132,12 @@ export const SERIES: SeriesSpec[] = [
   {
     id: 'heavy-b',
     name: 'HEAVY B Series',
-    tagline: 'Elegant ceiling patterns. Designer profile.',
+    subtitle: 'Enhanced Profile Design for Elegant Ceiling Patterns',
+    tagline: 'Designer profile. Architectural shadow lines.',
     warranty: '10 Years',
-    width: '20 cm',
-    thickness: '7.5 mm',
-    weight: '0.180 Kg/Lft',
+    width: '20 cm (±5 mm)',
+    thickness: '7.5 mm (±0.2 mm)',
+    weight: '0.220 Kg/Lft (±0.1 kg)',
     lengths: [
       { cm: '305', label: '305 cm (10 ft)' },
       { cm: '366', label: '366 cm (12 ft)' },
@@ -148,11 +154,12 @@ export const SERIES: SeriesSpec[] = [
   {
     id: 'i-series',
     name: 'i Series',
-    tagline: 'Premium flat finish. Seamless modern interiors.',
+    subtitle: 'Premium Flat Finish for Modern Interiors',
+    tagline: 'Architectural flat. Seamless transitions.',
     warranty: '10 Years',
-    width: '20 cm',
-    thickness: '7.5 mm',
-    weight: '0.180 Kg/Lft',
+    width: '20 cm (±5 mm)',
+    thickness: '7.5 mm (±0.2 mm)',
+    weight: '0.180 Kg/Lft (±0.1 kg)',
     lengths: [
       { cm: '305', label: '305 cm (10 ft)' },
       { cm: '366', label: '366 cm (12 ft)' },
