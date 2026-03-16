@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { Menu, X, ChevronDown, ArrowRight } from 'lucide-react';
+import { Menu, X, ChevronDown, ArrowRight, ShoppingBag } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 const seriesLinks = [
   {
@@ -34,10 +35,12 @@ const primaryLinks = [
   { label: 'Our Story', to: '/our-story' },
   { label: 'Inspiration', to: '/inspiration' },
   { label: 'Locate Store', to: '/locate-store' },
+  { label: 'Shop', to: '/shop' },
 ];
 
 export function Navbar() {
   const { pathname } = useLocation();
+  const { itemCount, openCart } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [collectionsOpen, setCollectionsOpen] = useState(false);
@@ -208,6 +211,20 @@ export function Navbar() {
           {/* Divider */}
           <div className="w-px h-5 bg-black/10 mx-1" />
 
+          {/* Cart Icon */}
+          <button
+            onClick={openCart}
+            aria-label="Open cart"
+            className="relative p-2.5 rounded-full text-brand-muted hover:text-brand-charcoal hover:bg-black/5 transition-all duration-200"
+          >
+            <ShoppingBag size={16} />
+            {itemCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-brand-charcoal text-white text-[8px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-0.5">
+                {itemCount}
+              </span>
+            )}
+          </button>
+
           {/* CTA */}
           <Link
             to="/quote"
@@ -230,13 +247,27 @@ export function Navbar() {
           <Link to="/" className="font-serif font-medium text-xl text-brand-charcoal tracking-tight">
             i<span className="text-[#3B82F6]">-</span>Panel<sup className="text-[9px]">®</sup>
           </Link>
-          <button
-            className="text-brand-charcoal p-1"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={openCart}
+              aria-label="Open cart"
+              className="relative p-2 text-brand-charcoal"
+            >
+              <ShoppingBag size={20} />
+              {itemCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-brand-charcoal text-white text-[8px] font-bold rounded-full min-w-[15px] h-[15px] flex items-center justify-center px-0.5">
+                  {itemCount}
+                </span>
+              )}
+            </button>
+            <button
+              className="text-brand-charcoal p-1"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
