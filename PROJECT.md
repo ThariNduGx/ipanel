@@ -1,7 +1,7 @@
 # i-Panel — Project Documentation
 
 > **Status:** In active development
-> **Last Updated:** March 2026
+> **Last Updated:** March 2026 (rev 2)
 > **Branch:** `claude/build-ipanel-pages-YA1ux`
 
 ---
@@ -24,7 +24,8 @@
 14. [SEO & Performance](#14-seo--performance)
 15. [Environment Variables](#15-environment-variables)
 16. [Conventions & Patterns](#16-conventions--patterns)
-17. [Known Gaps & Future Work](#17-known-gaps--future-work)
+17. [Changelog](#17-changelog)
+18. [Known Gaps & Future Work](#18-known-gaps--future-work)
 
 ---
 
@@ -408,9 +409,24 @@ Drag-handle before/after slider. Takes `beforeSrc` and `afterSrc` props.
 
 ## 7. State Management
 
-Cart state is managed via React Context + `useReducer`.
+Cart state is managed via React Context + `useReducer`, with automatic persistence to `localStorage`.
 
 **File:** `src/context/CartContext.tsx`
+
+### Persistence
+
+Cart items are saved to `localStorage` under the key `ipanel-cart` on every state change, and loaded back on app initialisation. This means the cart survives page refreshes, browser close/reopen, and navigation away from the site.
+
+```typescript
+// Saved automatically — no manual calls needed
+localStorage.setItem('ipanel-cart', JSON.stringify(state.items));
+
+// Loaded on first render
+const stored = localStorage.getItem('ipanel-cart');
+const initialItems = stored ? JSON.parse(stored) : [];
+```
+
+If `localStorage` is unavailable (private browsing restrictions, storage quota full), the failure is caught silently and the cart continues to work in-memory for the session.
 
 ### CartItem Type
 
@@ -717,14 +733,15 @@ Keep animations consistent by reusing these timing values:
 ## 12. E-Commerce Flow
 
 ```
-ProductsPage (/products)
-    └── SeriesPage (/products/:series)
+ProductsPage (/products)                     FinishingSeriesPage (/products/finishing-series)
+    └── SeriesPage (/products/:series)             └── Profile detail → /shop/product/finishing-matt-white?profile=A
             └── ColourPage (/products/:series/:slug)
-                    └── [Add to Cart] → CartContext
-                                            └── CartSidebar
-                                                    └── Checkout (/checkout)
-                                                            └── POST /api/orders
-                                                                    └── OrderConfirmation (/checkout/confirmation/:id)
+                    └── [Add to Cart] → CartContext (persisted to localStorage)
+                                            └── CartSidebar (slide-out)
+                                                    └── ShopCart (/cart)
+                                                            └── Checkout (/checkout)
+                                                                    └── POST /api/orders
+                                                                            └── OrderConfirmation (/checkout/confirmation/:id)
 ```
 
 ### Adding to Cart
@@ -735,20 +752,29 @@ From any product page, dispatch `ADD_ITEM` with a fully-populated `CartItem` obj
 const cartKey = `${seriesId}-${colorSlug}-${selectedLength}${selectedProfile ? `-${selectedProfile}` : ''}`;
 ```
 
-If an item with the same `cartKey` is added again, the quantity increments.
+If an item with the same `cartKey` is added again, the quantity increments. The cart sidebar opens automatically on add.
 
 ### Checkout
 
-`Checkout.tsx` collects:
-- Customer name, email, phone
-- Delivery address, city, province (Sri Lankan provinces dropdown)
-- Optional notes
+`Checkout.tsx` features:
+- **Steps progress indicator** — Cart → Checkout → Confirmation bar at the top of the page
+- Customer name, email, phone (Sri Lankan format validated: `^(\+94|0)[0-9]{9}$`)
+- Delivery address, city, province (9 Sri Lankan provinces dropdown)
+- Optional order notes
+- Sticky order summary sidebar with item breakdown
 
-On submit, it POSTs to `/api/orders` and redirects to `/checkout/confirmation/:id`.
+On submit, POSTs to `/api/orders` and redirects to `/checkout/confirmation/:id`. Cart is cleared on success.
 
 ### Order Confirmation
 
-`OrderConfirmation.tsx` fetches the order from `GET /api/orders/:id` and displays a summary.
+`OrderConfirmation.tsx` fetches the order from `GET /api/orders/:id` and displays:
+- Success header with customer first name
+- Order reference ID with a **copy-to-clipboard** button
+- Status badge (amber "pending")
+- Full item breakdown with subtotals
+- Delivery details (address, contact info)
+- **"What happens next?" timeline** — Three steps: team confirms order (within 1 business day) → delivery arranged (2–5 days lead time) → panels arrive. Includes contact phone and email.
+- Continue Shopping / Back to Home CTAs
 
 ---
 
@@ -894,39 +920,59 @@ export default function MyPage() {
 
 ---
 
-## 17. Known Gaps & Future Work
+## 17. Changelog
+
+### Rev 2 — March 2026
+
+**E-Commerce improvements:**
+- `CartContext.tsx` — Cart now persists to `localStorage`. Items survive page refresh and browser close.
+- `Checkout.tsx` — Added 3-step progress indicator (Cart → Checkout → Confirmation) at top of page. Relabelled "Back to Shop" → "Back to Cart".
+- `OrderConfirmation.tsx` — Added copy-to-clipboard button on order reference ID. Added "What happens next?" 3-step timeline section with contact phone/email.
+- `FinishingSeriesPage.tsx` — Fixed broken "Buy Profile A/B/C" button. Was routing to non-existent `/products/finishing-profile-a`. Now routes to `/shop/product/finishing-matt-white?profile=A`.
+
+**Products page redesign:**
+- `Products.tsx` — Replaced the static HTML comparison table in the "01 — Series Overview" section with a luxury editorial stacked list. Each series row features a faint ghost series code, animated gold left-accent bar on hover, inline badge pill, colour dot swatch strip, and a translating arrow.
+
+**Housekeeping:**
+- `index.html` — Title updated to "i-Panel — Luxury Wall & Ceiling Panels" with a meta description.
+- `package.json` — Project name updated from `react-example` to `ipanel`.
+
+---
+
+## 18. Known Gaps & Future Work
 
 ### Not Yet Implemented
 
-- **User authentication** — No login/account system. `/account` routes exist as UI shells only.
-- **Payment gateway** — Checkout collects order details but has no payment processing (no Stripe, PayHere, etc.)
-- **Email notifications** — No order confirmation emails sent to customers or admins
-- **Admin dashboard** — No way to view/manage orders without directly querying the database
-- **Inventory management** — No stock tracking; all products are always available
-- **Dealer portal** — `/find-a-dealer` exists but dealer data is likely hardcoded or incomplete
-- **Blog & Project CMS** — Blog and Projects pages exist but content may be hardcoded; no CMS integration
-- **Dynamic SEO** — No server-rendered meta tags, no sitemap
-- **Search** — No site-wide search functionality
-- **Product filtering/sorting** — Products page may lack advanced filter UX
-- **Multi-language support** — Site is English-only; no i18n framework in place
-- **Analytics** — No Google Analytics or other tracking configured
-- **Error monitoring** — No Sentry or equivalent
+- **User authentication** — No login/account system. `/account` routes exist as UI shells only (forms render but submit is a no-op).
+- **Payment gateway** — Checkout captures order details but has no payment processing. A Sri Lankan gateway (PayHere, Genie) or Stripe must be integrated before going live.
+- **Email notifications** — No order confirmation emails sent to customers or admins after checkout.
+- **Admin dashboard** — No interface to view/manage/fulfil orders. Orders are only accessible by querying `data/shop.db` directly.
+- **Order status progression** — Orders are created as `pending` and have no update mechanism. No fulfilment pipeline.
+- **Inventory management** — No stock tracking; all products always appear available.
+- **Dealer portal** — `/find-a-dealer` exists but dealer data is hardcoded. No backend for dealer management.
+- **Blog & Project CMS** — Blog and Projects pages exist but content is hardcoded. No CMS integration.
+- **Dynamic SEO** — Pure SPA, no server-rendered meta tags, no `sitemap.xml`, no `robots.txt`.
+- **Search** — No site-wide search.
+- **Multi-language** — English only; no i18n framework.
+- **Analytics** — No Google Analytics or equivalent tracking.
+- **Error monitoring** — No Sentry or equivalent.
 
 ### Technical Debt
 
-- `index.html` still has the default title "My Google AI Studio App" — update to "i-Panel"
-- `package.json` name is `react-example` — update to `ipanel`
-- README references Google AI Studio setup — replace with project-specific docs
-- `GEMINI_API_KEY` is exposed to the browser — move to backend proxy for production
-- No test suite currently exists
+- `README.md` still references Google AI Studio setup — replace with project-specific instructions.
+- `GEMINI_API_KEY` is exposed to the browser via `vite.config.ts` `define` — move AI calls to backend proxy before production.
+- Several TypeScript errors exist in pre-existing files (`ColourPage.tsx`, `Shop.tsx`, `SeriesPage.tsx`, etc.) — all are `key` prop type mismatches on sub-components. Non-breaking but should be resolved.
+- No test suite exists.
 
 ### Recommended Next Steps
 
-1. Set up a proper CMS (Sanity, Contentful, or Strapi) for blog, projects, and dealer data
-2. Integrate a Sri Lankan payment gateway (PayHere, Genie, or similar)
-3. Implement user authentication (Clerk, Firebase Auth, or custom JWT)
-4. Add server-side rendering (migrate to Next.js or add Vite SSR)
-5. Set up CI/CD pipeline with build and lint checks
-6. Add error monitoring (Sentry)
-7. Write unit tests for CartContext and key utility functions
-8. Properly size and optimize all product images (WebP format, multiple sizes)
+1. Integrate a Sri Lankan payment gateway (PayHere or Genie) — highest priority before launch
+2. Add `nodemailer` or a transactional email service (Resend, SendGrid) for order confirmation emails
+3. Build a minimal admin UI (a protected `/admin/orders` route) to view and update order status
+4. Set up a CMS (Sanity, Contentful, or Strapi) for blog, projects, and dealer data
+5. Implement user authentication (Clerk, Firebase Auth, or custom JWT)
+6. Add `react-helmet-async` for per-page `<title>` and meta tags
+7. Add `sitemap.xml` and `robots.txt`
+8. Write unit tests for `CartContext` and key utility functions
+9. Optimise and compress all product images (WebP format, `srcset` for responsive sizes)
+10. Consider migrating to Next.js (App Router) for SSR/SSG and better SEO
