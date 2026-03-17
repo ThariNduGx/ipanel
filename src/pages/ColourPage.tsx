@@ -51,23 +51,23 @@ function ProfileCard({ profile, colourName, index }: { profile: { id: string; la
 const finishingProfiles = [
   {
     id: 'A',
-    label: 'Profile A',
-    name: 'Concave Cornice',
-    description: 'A classic concave transition between wall and ceiling plane. Recommended where traditional residential detailing is required.',
+    label: 'Profile A — 4" × 4"',
+    name: 'Profile A',
+    description: '4" × 4" equal coverage on ceiling and wall face. For large rooms, high ceilings, and feature installations where a generous cornice presence is required.',
     image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=400&q=80',
   },
   {
     id: 'B',
-    label: 'Profile B',
-    name: 'Square Reveal',
-    description: 'A crisp 90-degree shadow reveal that suits contemporary architectural interiors where clean geometric language is the design directive.',
+    label: 'Profile B — 2" × 2"',
+    name: 'Profile B',
+    description: '2" × 2" equal coverage. Standard residential — the most widely specified profile in the i-Panel range. Clean, proportionate, suitable for any ceiling height.',
     image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=400&q=80',
   },
   {
     id: 'C',
-    label: 'Profile C',
-    name: 'Ogee Moulding',
-    description: 'A compound curved profile combining convex and concave elements to produce a classically detailed transition with architectural depth.',
+    label: 'Profile C — 3" × 1"',
+    name: 'Profile C',
+    description: 'Asymmetric — 3" on the ceiling face, 1" on the wall face. The only non-square profile in the range. For installations where wall intrusion must be minimal while ceiling presence is maintained.',
     image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=400&q=80',
   },
 ];

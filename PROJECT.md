@@ -246,7 +246,7 @@ All routes are defined in `src/App.tsx`. The site uses React Router v7 with `<Br
 | Path | Component |
 |---|---|
 | `/about` | `AboutHub` |
-| `/about/our-story` | `OurStory` |
+| `/our-story` | `OurStory` (canonical — `/about/our-story` redirects here) |
 | `/about/why-ipanel` | `WhyIPanell` |
 | `/about/sustainability` | `SustainabilityPage` |
 | `/about/awards` | `Awards` |
@@ -302,8 +302,8 @@ All routes are defined in `src/App.tsx`. The site uses React Router v7 with `<Br
 
 | Path | Component |
 |---|---|
-| `/find-a-dealer` | `FindADealer` |
-| `/find-a-dealer/:province` | `FindADealer` (province-filtered) |
+| `/dealers` | `FindADealer` (canonical) |
+| `/dealers/:province` | `FindADealer` (province-filtered) |
 | `/become-a-dealer` | `BecomeADealer` |
 
 #### Legal
@@ -313,22 +313,26 @@ All routes are defined in `src/App.tsx`. The site uses React Router v7 with `<Br
 | `/privacy-policy` | `PrivacyPolicy` |
 | `/terms-and-conditions` | `TermsAndConditions` |
 | `/warranty` | `WarrantyPage` |
-| `/warranty-activation` | `WarrantyActivation` |
+| `/resources/warranty-activation` | `WarrantyActivation` (canonical) |
 
 #### Legacy Redirects (301-style Navigate)
 
 | Old Path | Redirects To |
 |---|---|
-| `/our-story` | `/about/our-story` |
+| `/about/our-story` | `/our-story` |
 | `/faq` | `/resources/faq` |
-| `/locate-store` | `/find-a-dealer` |
+| `/locate-store` | `/dealers` |
+| `/find-a-dealer` | `/dealers` |
+| `/find-a-dealer/:province` | `/dealers` |
+| `/warranty-activation` | `/resources/warranty-activation` |
 | `/quote` | `/get-a-quote` |
 | `/shop` | `/products` |
 | `/shop/cart` | `/cart` |
 | `/shop/checkout` | `/checkout` |
+| `/shop/product/:sku` | `/products` |
 | `/products/architectural-flat` | `/products/i-series` |
 | `/products/architectural-heavy` | `/products/heavy-b` |
-| (other old slugs) | new clean slugs |
+| (other old product slugs) | new clean slugs |
 
 ### Layout Pattern
 
@@ -485,22 +489,44 @@ Product and color data are **static TypeScript files** — not fetched from an A
 Defines the product series catalog:
 
 ```typescript
-interface ProductSeries {
+interface SeriesSpec {
   id: string;               // "i-series" | "heavy-b" | "lite" | "finishing"
   name: string;             // "i Series"
   subtitle: string;
   tagline: string;
-  warranty: string;         // "7 Years"
-  width: string;            // "12 in (±5 mm)"
-  thickness: string;        // "8 mm"
-  weight: string;           // "0.250 Kg/Lft"
+  warranty: string;         // "10 Years" / "5 Years" / "15 Years" — per series (NEVER "7 Years")
+  width: string;            // "20 cm (±5 mm)" / "30 cm (±5 mm)" for LITE
+  thickness: string;        // "7.5 mm (±0.2 mm)" — ALL series (NEVER "8 mm")
+  weight: string;           // "0.180 Kg/Lft (±0.1 kg)" / "0.270 Kg/Lft" for LITE / "0.09" for Finishing
   lengths: Array<{
-    cm: string;             // "305"
+    cm: string;             // "305" | "366" for panels — "122" ONLY for Finishing Series
     label: string;          // "305 cm (10 ft)"
   }>;
-  prices: Record<string, number>;  // { "305": 3500, "366": 4200 }
-  colors: string[];         // Array of color names available in this series
+  profiles?: Array<{        // Finishing Series only — 3 profiles
+    id: 'A' | 'B' | 'C';
+    name: string;
+    shape: string;          // "4\" × 4\"" | "2\" × 2\"" | "3\" × 1\""
+  }>;
+  prices: Partial<Record<'122' | '305' | '366', number>>;
+  colors: string[];
+  /**
+   * m² coverage per panel by length.
+   * i-series:  { "305": 0.61, "366": 0.732 }
+   * heavy-b:   { "305": 0.61, "366": 0.732 }
+   * lite:      { "305": 0.915, "366": 1.098 }
+   * finishing: { "122": null }  — uses perimeter formula, not area
+   */
+  coveragePerPanel: Partial<Record<string, number | null>>;
 }
+```
+
+**Coverage calculator formulas:**
+```typescript
+// Panels (i-series, heavy-b, lite)
+Math.ceil((roomLengthM * roomWidthM) / coverage * 1.10)
+
+// Finishing profiles — perimeter, not area
+Math.ceil((2 * (roomLengthM + roomWidthM)) / 1.22 * 1.05)
 ```
 
 ### `src/data/colours.ts`
@@ -803,10 +829,15 @@ Not all series offer all lengths — check `shopProducts.ts` for per-series avai
 
 ### Finishing Series Profiles
 
-The Finishing Series has 3 sub-profiles:
-- **Profile A** — Flat end cap
-- **Profile B** — Corner trim
-- **Profile C** — J-channel / edge trim
+The Finishing Series has 3 sub-profiles, defined by geometric shape and coverage dimensions:
+
+| Profile | Shape | Coverage | Use Case |
+|---|---|---|---|
+| **A** | 4" × 4" | Equal on ceiling and wall | Large rooms, high ceilings, feature installations |
+| **B** | 2" × 2" | Equal on ceiling and wall | Standard residential — most widely specified |
+| **C** | 3" × 1" | **Asymmetric** — 3" ceiling / 1" wall | Installations where wall intrusion must be minimal |
+
+Profile C is the **only non-square profile** in the range. Its asymmetry (3" ceiling / 1" wall) is its defining characteristic — do not describe it as a "J-channel" or generic edge trim.
 
 These are selected via a `selectedProfile` field on the CartItem.
 
@@ -922,6 +953,28 @@ export default function MyPage() {
 
 ## 17. Changelog
 
+### Rev 3 — March 2026
+
+**Data corrections:**
+- `shopProducts.ts` — Fixed LITE Series width: `"12 in (±5 mm)"` → `"30 cm (±5 mm)"`.
+- `shopProducts.ts` — Fixed HEAVY-B Series weight: `0.220` → `0.180 Kg/Lft`.
+- `shopProducts.ts` — Fixed LITE Series weight: `0.220` → `0.270 Kg/Lft`.
+- `shopProducts.ts` — Added `coveragePerPanel` field to `SeriesSpec` interface with confirmed m² values per series and length (Finishing: `null`, uses perimeter formula).
+- `shopProducts.ts` — Fixed Profile A/B/C `shape` separator: `"4" : 4""` → `"4" × 4""`. Added inline comments documenting each profile's geometry and use case.
+- `ColourPage.tsx` — Corrected finishing profile card names and descriptions. Profile A is "4" × 4" equal coverage", Profile B is "2" × 2" equal coverage", Profile C is the only **asymmetric** profile (3" ceiling / 1" wall).
+- `FinishingSeriesPage.tsx` — Corrected profile descriptions to match confirmed geometry. Fixed buy button: was routing to non-existent `/shop/product/finishing-matt-white?profile=A`; now routes to `/products/finishing-series` (the hub with full colour/profile selection).
+
+**Route corrections (v2.1 → v2.2):**
+- `OurStory` canonical URL: `/about/our-story` → `/our-story`. Added 301 redirect from `/about/our-story`.
+- `FindADealer` canonical URL: `/find-a-dealer` → `/dealers`. Added redirects from `/find-a-dealer` and `/find-a-dealer/:province`.
+- `WarrantyActivation` canonical URL: `/warranty-activation` → `/resources/warranty-activation`. Added redirect from old URL.
+- `ShopProductDetail` (`/shop/product/:sku`) removed as a live route. Route now redirects to `/products`. Removed `ShopProductDetail` import from `App.tsx`.
+
+**Security:**
+- `vite.config.ts` — Removed `GEMINI_API_KEY` from `define` block. The key was being bundled into the compiled JavaScript and was readable by anyone accessing the page. No frontend code was using it, so no AI functionality is affected. If an AI feature is added in future, the call must go through the Express backend proxy.
+
+---
+
 ### Rev 2 — March 2026
 
 **E-Commerce improvements:**
@@ -960,9 +1013,9 @@ export default function MyPage() {
 ### Technical Debt
 
 - `README.md` still references Google AI Studio setup — replace with project-specific instructions.
-- `GEMINI_API_KEY` is exposed to the browser via `vite.config.ts` `define` — move AI calls to backend proxy before production.
 - Several TypeScript errors exist in pre-existing files (`ColourPage.tsx`, `Shop.tsx`, `SeriesPage.tsx`, etc.) — all are `key` prop type mismatches on sub-components. Non-breaking but should be resolved.
 - No test suite exists.
+- ~~`GEMINI_API_KEY` exposed to browser~~ — **resolved in Rev 3** (removed from `define` block).
 
 ### Recommended Next Steps
 

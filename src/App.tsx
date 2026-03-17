@@ -56,7 +56,6 @@ import { ShopCart } from './pages/ShopCart';
 import { Checkout } from './pages/Checkout';
 import { OrderConfirmation } from './pages/OrderConfirmation';
 import { ShopMyAccount } from './pages/ShopMyAccount';
-import { ShopProductDetail } from './pages/ShopProductDetail';
 
 // Dealers
 import { FindADealer } from './pages/FindADealer';
@@ -99,7 +98,7 @@ export default function App() {
 
           {/* ── About ── */}
           <Route path="/about" element={<AboutHub />} />
-          <Route path="/about/our-story" element={<OurStory />} />
+          <Route path="/our-story" element={<OurStory />} />
           <Route path="/about/why-ipanel" element={<WhyIPanell />} />
           <Route path="/about/sustainability" element={<SustainabilityPage />} />
           <Route path="/about/awards" element={<Awards />} />
@@ -142,13 +141,13 @@ export default function App() {
           <Route path="/resources/projects" element={<ProjectsHub />} />
           <Route path="/resources/projects/:slug" element={<ProjectDetail />} />
 
-          {/* ── Shop (legacy /shop/* kept as redirects) ── */}
+          {/* ── Shop (legacy /shop/* → redirects) ── */}
           <Route path="/shop" element={<Navigate to="/products" replace />} />
           <Route path="/shop/cart" element={<Navigate to="/cart" replace />} />
           <Route path="/shop/checkout" element={<Navigate to="/checkout" replace />} />
           <Route path="/shop/order-confirmation/:id" element={<Navigate to="/checkout/confirmation/:id" replace />} />
           <Route path="/shop/my-account" element={<Navigate to="/account" replace />} />
-          <Route path="/shop/product/:sku" element={<ShopProductDetail />} />
+          <Route path="/shop/product/:sku" element={<Navigate to="/products" replace />} />
 
           {/* ── Transactional — clean URLs ── */}
           <Route path="/cart" element={<ShopCart />} />
@@ -159,20 +158,23 @@ export default function App() {
           <Route path="/account/certificates" element={<ShopMyAccount />} />
 
           {/* ── Dealers ── */}
-          <Route path="/find-a-dealer" element={<FindADealer />} />
-          <Route path="/find-a-dealer/:province" element={<FindADealer />} />
+          <Route path="/dealers" element={<FindADealer />} />
+          <Route path="/dealers/:province" element={<FindADealer />} />
           <Route path="/become-a-dealer" element={<BecomeADealer />} />
 
           {/* ── Legal ── */}
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="/warranty" element={<WarrantyPage />} />
-          <Route path="/warranty-activation" element={<WarrantyActivation />} />
+          <Route path="/resources/warranty-activation" element={<WarrantyActivation />} />
 
           {/* ── Legacy redirects ── */}
-          <Route path="/our-story" element={<Navigate to="/about/our-story" replace />} />
+          <Route path="/about/our-story" element={<Navigate to="/our-story" replace />} />
           <Route path="/faq" element={<Navigate to="/resources/faq" replace />} />
-          <Route path="/locate-store" element={<Navigate to="/find-a-dealer" replace />} />
+          <Route path="/locate-store" element={<Navigate to="/dealers" replace />} />
+          <Route path="/find-a-dealer" element={<Navigate to="/dealers" replace />} />
+          <Route path="/find-a-dealer/:province" element={<Navigate to="/dealers" replace />} />
+          <Route path="/warranty-activation" element={<Navigate to="/resources/warranty-activation" replace />} />
           <Route path="/quote" element={<Navigate to="/get-a-quote" replace />} />
           <Route path="/order-confirmation/:id" element={<Navigate to="/checkout/confirmation/:id" replace />} />
           {/* Old product URL slugs → new clean slugs */}
