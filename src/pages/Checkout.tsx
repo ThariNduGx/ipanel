@@ -1,6 +1,6 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, Check } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Navbar } from '../components/Navbar';
 import { CartSidebar } from '../components/CartSidebar';
@@ -146,8 +146,39 @@ export function Checkout() {
           className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted hover:text-brand-charcoal transition-colors mb-8"
         >
           <ArrowLeft size={12} />
-          Back to Shop
+          Back to Cart
         </Link>
+
+        {/* Steps indicator */}
+        <div className="flex items-center gap-0 mb-10 max-w-xs">
+          {[
+            { label: 'Cart', done: true },
+            { label: 'Checkout', done: false, active: true },
+            { label: 'Confirmation', done: false },
+          ].map((step, i, arr) => (
+            <div key={step.label} className="flex items-center">
+              <div className="flex flex-col items-center gap-1">
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold transition-colors ${
+                    step.done
+                      ? 'bg-brand-charcoal text-white'
+                      : step.active
+                      ? 'bg-brand-gold text-white'
+                      : 'bg-black/8 text-brand-muted'
+                  }`}
+                >
+                  {step.done ? <Check size={11} strokeWidth={3} /> : i + 1}
+                </div>
+                <span className={`text-[9px] uppercase tracking-[0.12em] font-bold whitespace-nowrap ${step.active ? 'text-brand-charcoal' : 'text-brand-muted'}`}>
+                  {step.label}
+                </span>
+              </div>
+              {i < arr.length - 1 && (
+                <div className={`w-12 h-px mb-4 mx-1 ${step.done ? 'bg-brand-charcoal' : 'bg-black/10'}`} />
+              )}
+            </div>
+          ))}
+        </div>
 
         <h1 className="font-serif text-3xl md:text-4xl font-medium text-brand-charcoal mb-10">
           Checkout

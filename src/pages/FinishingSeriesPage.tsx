@@ -84,10 +84,10 @@ export function FinishingSeriesPage() {
                 ))}
               </div>
               <Link
-                to={`/products/finishing-profile-${p.id.toLowerCase()}`}
+                to={`/shop/product/finishing-matt-white?profile=${p.id}`}
                 className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-brand-charcoal text-white text-[11px] uppercase tracking-[0.15em] font-bold hover:bg-brand-charcoal/90 transition-all"
               >
-                <ShoppingBag size={14} /> Buy Profile {p.id}
+                <ShoppingBag size={14} /> Shop Profile {p.id}
               </Link>
             </div>
           </section>

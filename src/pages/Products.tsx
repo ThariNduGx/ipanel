@@ -561,35 +561,64 @@ export function ProductsPage() {
             </BlurReveal>
 
             <BlurReveal delay={0.2}>
-              <div className="border border-black/5 overflow-hidden shadow-sm">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-black/5 bg-brand-surface">
-                      <th className="text-left px-6 py-4 text-[9px] uppercase tracking-widest font-bold text-brand-gold-dark">Series</th>
-                      <th className="text-left px-6 py-4 text-[9px] uppercase tracking-widest font-bold text-brand-gold-dark">Profile</th>
-                      <th className="text-left px-6 py-4 text-[9px] uppercase tracking-widest font-bold text-brand-gold-dark">Colours</th>
-                      <th className="text-left px-6 py-4 text-[9px] uppercase tracking-widest font-bold text-brand-gold-dark">Warranty</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-black/5 bg-white">
-                    {allSeries.map(s => (
-                      <tr key={s.id} className="transition-colors hover:bg-brand-gold/5 group">
-                        <td className="px-6 py-4">
-                          <Link to={s.route} className="font-bold font-sans text-brand-charcoal group-hover:text-brand-gold-dark transition-colors text-sm flex items-center gap-2">
-                            {s.name} <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                          </Link>
-                        </td>
-                        <td className="px-6 py-4 text-brand-muted font-light text-xs">{s.profile.split('·')[0].trim()}</td>
-                        <td className="px-6 py-4 text-brand-charcoal font-bold text-xs">{s.colours.length}</td>
-                        <td className="px-6 py-4">
-                          <span className="px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider bg-brand-gold/10 text-brand-gold-dark">
-                            {s.warranty}
+              <div className="divide-y divide-black/5">
+                {allSeries.map((s) => (
+                  <Link
+                    key={s.id}
+                    to={s.route}
+                    className="group relative flex items-center gap-5 py-5 transition-all duration-300"
+                  >
+                    {/* Gold left accent on hover */}
+                    <div className="absolute -left-5 top-0 h-full w-[2px] bg-brand-gold scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-top rounded-full" />
+
+                    {/* Ghost series code */}
+                    <span className="font-serif text-4xl font-light text-black/[0.06] group-hover:text-brand-gold/20 transition-colors w-10 shrink-0 select-none leading-none">
+                      {s.code}
+                    </span>
+
+                    {/* Name + specs */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className="font-serif text-[17px] text-brand-charcoal group-hover:text-brand-gold-dark transition-colors leading-tight">
+                          {s.name}
+                        </span>
+                        {s.badge && (
+                          <span className="text-[7.5px] uppercase tracking-[0.18em] font-bold px-2 py-0.5 bg-brand-gold/10 text-brand-gold-dark border border-brand-gold/15">
+                            {s.badge}
                           </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-brand-muted font-sans leading-none">
+                        {s.profile.split('·')[0].trim()}
+                        <span className="mx-1.5 opacity-30">·</span>
+                        <span className="font-bold text-brand-charcoal/60">{s.warranty}</span>
+                      </p>
+                    </div>
+
+                    {/* Colour dot strip */}
+                    <div className="flex items-center gap-[3px] shrink-0">
+                      {s.colours.slice(0, 7).map((c) => (
+                        <div
+                          key={c.name}
+                          title={c.name}
+                          className="w-[14px] h-[14px] rounded-full border border-black/10 transition-all duration-300 group-hover:border-brand-gold/25"
+                          style={{ backgroundColor: c.hex }}
+                        />
+                      ))}
+                      {s.colours.length > 7 && (
+                        <span className="text-[9px] font-bold text-brand-muted font-sans ml-1">
+                          +{s.colours.length - 7}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Arrow */}
+                    <ArrowRight
+                      size={13}
+                      className="text-brand-muted/40 group-hover:text-brand-gold-dark transition-all duration-300 group-hover:translate-x-1 shrink-0"
+                    />
+                  </Link>
+                ))}
               </div>
             </BlurReveal>
           </div>

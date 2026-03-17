@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { CheckCircle, ArrowRight, Loader2, Package } from 'lucide-react';
+import { CheckCircle, ArrowRight, Loader2, Package, Copy, Check, Phone, Truck, ClipboardCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -36,6 +36,14 @@ export function OrderConfirmation() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  function copyOrderId(orderId: string) {
+    navigator.clipboard.writeText(orderId).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -106,7 +114,7 @@ export function OrderConfirmation() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white rounded-2xl border border-black/5 p-5 mb-5 flex items-center justify-between"
+          className="bg-white rounded-2xl border border-black/5 p-5 mb-5 flex items-center justify-between gap-4"
         >
           <div>
             <p className="text-[10px] uppercase tracking-[0.12em] font-bold text-brand-muted mb-1">
@@ -114,13 +122,23 @@ export function OrderConfirmation() {
             </p>
             <p className="font-mono text-sm font-bold text-brand-charcoal">{order.id}</p>
           </div>
-          <div className="text-right">
-            <p className="text-[10px] uppercase tracking-[0.12em] font-bold text-brand-muted mb-1">
-              Status
-            </p>
-            <span className="inline-block px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider border border-amber-200">
-              {order.status}
-            </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => copyOrderId(order.id)}
+              title="Copy order ID"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-black/8 text-brand-muted hover:text-brand-charcoal hover:border-black/20 transition-all text-[10px] uppercase tracking-wider font-bold"
+            >
+              {copied ? <Check size={11} className="text-green-500" /> : <Copy size={11} />}
+              {copied ? 'Copied' : 'Copy'}
+            </button>
+            <div className="text-right">
+              <p className="text-[10px] uppercase tracking-[0.12em] font-bold text-brand-muted mb-1">
+                Status
+              </p>
+              <span className="inline-block px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider border border-amber-200">
+                {order.status}
+              </span>
+            </div>
           </div>
         </motion.div>
 
@@ -207,11 +225,62 @@ export function OrderConfirmation() {
           </div>
         </motion.div>
 
+        {/* What happens next */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+          className="bg-white rounded-2xl border border-black/5 p-5 mb-8"
+        >
+          <h2 className="font-serif text-sm font-medium text-brand-charcoal mb-4">
+            What happens next?
+          </h2>
+          <div className="space-y-4">
+            {[
+              {
+                icon: Phone,
+                title: 'We confirm your order',
+                desc: 'Our team will call you within 1 business day to verify your order and discuss delivery.',
+              },
+              {
+                icon: Truck,
+                title: 'Delivery is arranged',
+                desc: 'Once confirmed, we schedule delivery to your address. Typical lead time is 2–5 business days.',
+              },
+              {
+                icon: ClipboardCheck,
+                title: 'Panels arrive',
+                desc: 'Panels are delivered to your site. Keep your order reference handy for the delivery crew.',
+              },
+            ].map((step, i) => (
+              <div key={i} className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-brand-surface flex items-center justify-center shrink-0 mt-0.5">
+                  <step.icon size={13} className="text-brand-gold" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-brand-charcoal">{step.title}</p>
+                  <p className="text-[11px] text-brand-muted leading-relaxed mt-0.5">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 pt-4 border-t border-black/5 text-[11px] text-brand-muted">
+            Questions? Call us at{' '}
+            <a href="tel:+94112345678" className="font-bold text-brand-charcoal hover:text-brand-gold transition-colors">
+              +94 11 234 5678
+            </a>{' '}
+            or email{' '}
+            <a href="mailto:orders@ipanel.lk" className="font-bold text-brand-charcoal hover:text-brand-gold transition-colors">
+              orders@ipanel.lk
+            </a>
+          </div>
+        </motion.div>
+
         {/* Actions */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.35 }}
           className="flex flex-col sm:flex-row gap-3"
         >
           <Link
