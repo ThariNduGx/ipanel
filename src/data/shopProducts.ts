@@ -81,6 +81,13 @@ export interface SeriesSpec {
   /** LKR per piece, keyed by length in cm */
   prices: Partial<Record<LengthOption, number>>;
   colors: string[];
+  /**
+   * Coverage area in m² per panel, keyed by length in cm.
+   * Null for Finishing Series — profiles use a perimeter formula, not area.
+   * Calculator formula for panels: Math.ceil((roomLength * roomWidth) / coverage * 1.10)
+   * Calculator formula for profiles: Math.ceil((2 * (roomLength + roomWidth)) / 1.22 * 1.05)
+   */
+  coveragePerPanel: Partial<Record<LengthOption, number | null>>;
 }
 
 export const SERIES: SeriesSpec[] = [
@@ -95,11 +102,28 @@ export const SERIES: SeriesSpec[] = [
     weight: '0.09 Kg/Lft (±0.05 kg)',
     lengths: [{ cm: '122', label: '122 cm (4 ft)' }],
     profiles: [
-      { id: 'A', name: 'Profile A', shape: '4" : 4"' },
-      { id: 'B', name: 'Profile B', shape: '2" : 2"' },
-      { id: 'C', name: 'Profile C', shape: '3" : 1"' },
+      {
+        id: 'A',
+        name: 'Profile A',
+        shape: '4" × 4"',
+        // Equal coverage on ceiling and wall face. For large rooms, high ceilings, feature installations.
+      },
+      {
+        id: 'B',
+        name: 'Profile B',
+        shape: '2" × 2"',
+        // Equal coverage. Standard residential — most widely specified profile in the range.
+      },
+      {
+        id: 'C',
+        name: 'Profile C',
+        shape: '3" × 1"',
+        // ASYMMETRIC — 3" on ceiling face, 1" on wall face. The only non-square profile in the range.
+        // For installations where wall intrusion must be minimal.
+      },
     ],
     prices: { '122': 1400 },
+    coveragePerPanel: { '122': null }, // profiles use perimeter formula — see interface docs
     colors: [
       'Matt White', 'Solid Fabric', 'Silver Line', 'Black Line',
       'Gold Line', 'White Wood', 'Gray Wood', 'Pine Wood',
@@ -114,14 +138,15 @@ export const SERIES: SeriesSpec[] = [
     subtitle: 'Refined Simplicity, Trusted Performance',
     tagline: 'Project-focused. Wider panels, faster coverage.',
     warranty: '5 Years',
-    width: '12 in (±5 mm)',
+    width: '30 cm (±5 mm)',
     thickness: '7.5 mm (±0.2 mm)',
-    weight: '0.220 Kg/Lft (±0.1 kg)',
+    weight: '0.270 Kg/Lft (±0.1 kg)',
     lengths: [
       { cm: '305', label: '305 cm (10 ft)' },
       { cm: '366', label: '366 cm (12 ft)' },
     ],
     prices: { '305': 2800, '366': 3200 },
+    coveragePerPanel: { '305': 0.915, '366': 1.098 },
     colors: [
       'Matt White', 'Solid Fabric', 'Silver Line', 'Black Line',
       'Gold Line', 'White Wood', 'Gray Wood', 'Pine Wood',
@@ -137,12 +162,13 @@ export const SERIES: SeriesSpec[] = [
     warranty: '10 Years',
     width: '20 cm (±5 mm)',
     thickness: '7.5 mm (±0.2 mm)',
-    weight: '0.220 Kg/Lft (±0.1 kg)',
+    weight: '0.180 Kg/Lft (±0.1 kg)',
     lengths: [
       { cm: '305', label: '305 cm (10 ft)' },
       { cm: '366', label: '366 cm (12 ft)' },
     ],
     prices: { '305': 3200, '366': 3700 },
+    coveragePerPanel: { '305': 0.61, '366': 0.732 },
     colors: [
       'Matt White', 'Solid Fabric', 'Silver Line', 'Black Line',
       'Gold Line', 'White Wood', 'Gray Wood', 'Pine Wood',
@@ -165,6 +191,7 @@ export const SERIES: SeriesSpec[] = [
       { cm: '366', label: '366 cm (12 ft)' },
     ],
     prices: { '305': 3400, '366': 3900 },
+    coveragePerPanel: { '305': 0.61, '366': 0.732 },
     colors: [
       'Matt White', 'Solid Fabric', 'White Wood', 'Gray Wood',
       'Pine Wood', 'Rich Maple', 'Nadun', 'Golden Teak',

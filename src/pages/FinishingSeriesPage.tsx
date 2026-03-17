@@ -11,9 +11,27 @@ const profileImages = {
 };
 
 const profiles = [
-  { slug: 'profile-a-4-4', id: 'A', shape: '4" : 4"', label: 'Profile A', desc: 'A generous equal-arm cornice for grand rooms. The 4" rise on both wall and ceiling faces creates a classic architectural transition.' },
-  { slug: 'profile-b-2-2', id: 'B', shape: '2" : 2"', label: 'Profile B', desc: 'A compact symmetrical profile for tighter perimeters. Ideal for standard ceiling heights where a subtle but clean edge is required.' },
-  { slug: 'profile-c-3-1', id: 'C', shape: '3" : 1"', label: 'Profile C', desc: 'An asymmetric profile with a dominant ceiling run and a slim wall reveal. Excellent for contemporary interiors that want presence without bulk.' },
+  {
+    slug: 'profile-a-4-4',
+    id: 'A',
+    shape: '4" × 4"',
+    label: 'Profile A',
+    desc: '4" × 4" equal coverage on ceiling and wall face. For large rooms, high ceilings, and feature installations where a generous cornice presence is required.',
+  },
+  {
+    slug: 'profile-b-2-2',
+    id: 'B',
+    shape: '2" × 2"',
+    label: 'Profile B',
+    desc: '2" × 2" equal coverage. Standard residential — the most widely specified profile in the i-Panel range. Proportionate and suitable for any ceiling height.',
+  },
+  {
+    slug: 'profile-c-3-1',
+    id: 'C',
+    shape: '3" × 1"',
+    label: 'Profile C',
+    desc: 'Asymmetric — 3" on the ceiling face, 1" on the wall face. The only non-square profile in the range. For installations where wall intrusion must be minimal.',
+  },
 ];
 
 const finishingSeries = SERIES.find((s) => s.id === 'finishing')!;
@@ -84,10 +102,10 @@ export function FinishingSeriesPage() {
                 ))}
               </div>
               <Link
-                to={`/shop/product/finishing-matt-white?profile=${p.id}`}
+                to="/products/finishing-series"
                 className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-brand-charcoal text-white text-[11px] uppercase tracking-[0.15em] font-bold hover:bg-brand-charcoal/90 transition-all"
               >
-                <ShoppingBag size={14} /> Shop Profile {p.id}
+                <ShoppingBag size={14} /> View All Profiles &amp; Colours
               </Link>
             </div>
           </section>
