@@ -595,19 +595,24 @@ export function ProductsPage() {
                       </p>
                     </div>
 
-                    {/* Colour dot strip */}
+                    {/* Colour texture box strip */}
                     <div className="flex items-center gap-[3px] shrink-0">
-                      {s.colours.slice(0, 7).map((c) => (
+                      {s.colours.slice(0, 6).map((c) => (
                         <div
                           key={c.name}
                           title={c.name}
-                          className="w-[14px] h-[14px] rounded-full border border-black/10 transition-all duration-300 group-hover:border-brand-gold/25"
-                          style={{ backgroundColor: c.hex }}
-                        />
+                          className="w-[22px] h-[28px] overflow-hidden border border-black/10 transition-all duration-300 group-hover:border-brand-gold/30 flex-shrink-0"
+                        >
+                          <img
+                            src={c.image}
+                            alt={c.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
                       ))}
-                      {s.colours.length > 7 && (
+                      {s.colours.length > 6 && (
                         <span className="text-[9px] font-bold text-brand-muted font-sans ml-1">
-                          +{s.colours.length - 7}
+                          +{s.colours.length - 6}
                         </span>
                       )}
                     </div>
