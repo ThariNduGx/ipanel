@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   ShieldCheck, Droplets, Flame, Leaf,
   ArrowRight, Phone, MessageCircle, MapPin,
-  CheckCircle2, Layers, BadgeCheck, Zap, ChevronRight,
+  CheckCircle2, Layers, BadgeCheck, Zap, ChevronRight, ChevronDown,
 } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -444,6 +444,8 @@ function SeriesSection({ s, isReversed }: { s: SeriesData; isReversed: boolean }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export function ProductsPage() {
+  const [expandedSeries, setExpandedSeries] = useState<string | null>(null);
+
   return (
     <div className="bg-brand-surface min-h-screen text-brand-charcoal font-sans overflow-x-hidden">
       <Navbar />
@@ -562,68 +564,95 @@ export function ProductsPage() {
 
             <BlurReveal delay={0.2}>
               <div className="divide-y divide-black/5">
-                {allSeries.map((s) => (
-                  <Link
-                    key={s.id}
-                    to={s.route}
-                    className="group relative flex items-center gap-5 py-5 transition-all duration-300"
-                  >
-                    {/* Gold left accent on hover */}
-                    <div className="absolute -left-5 top-0 h-full w-[2px] bg-brand-gold scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-top rounded-full" />
+                {allSeries.map((ser) => {
+                  const isOpen = expandedSeries === ser.id;
+                  return (
+                    <div key={ser.id}>
+                      {/* ── Row header (clickable) ── */}
+                      <button
+                        onClick={() => setExpandedSeries(isOpen ? null : ser.id)}
+                        className="group relative w-full flex items-center gap-5 py-5 text-left transition-all duration-300"
+                      >
+                        {/* Gold left accent on expand */}
+                        <div className={`absolute -left-5 top-0 h-full w-[2px] bg-brand-gold transition-transform duration-300 origin-top rounded-full ${isOpen ? 'scale-y-100' : 'scale-y-0 group-hover:scale-y-100'}`} />
 
-                    {/* Ghost series code */}
-                    <span className="font-serif text-4xl font-light text-black/[0.06] group-hover:text-brand-gold/20 transition-colors w-10 shrink-0 select-none leading-none">
-                      {s.code}
-                    </span>
-
-                    {/* Name + specs */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <span className="font-serif text-[17px] text-brand-charcoal group-hover:text-brand-gold-dark transition-colors leading-tight">
-                          {s.name}
+                        {/* Ghost series code */}
+                        <span className={`font-serif text-4xl font-light w-10 shrink-0 select-none leading-none transition-colors ${isOpen ? 'text-brand-gold/30' : 'text-black/[0.06] group-hover:text-brand-gold/20'}`}>
+                          {ser.code}
                         </span>
-                        {s.badge && (
-                          <span className="text-[7.5px] uppercase tracking-[0.18em] font-bold px-2 py-0.5 bg-brand-gold/10 text-brand-gold-dark border border-brand-gold/15">
-                            {s.badge}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[10px] text-brand-muted font-sans leading-none">
-                        {s.profile.split('·')[0].trim()}
-                        <span className="mx-1.5 opacity-30">·</span>
-                        <span className="font-bold text-brand-charcoal/60">{s.warranty}</span>
-                      </p>
-                    </div>
 
-                    {/* Colour texture box strip */}
-                    <div className="flex items-center gap-[3px] shrink-0">
-                      {s.colours.slice(0, 6).map((c) => (
-                        <div
-                          key={c.name}
-                          title={c.name}
-                          className="w-[22px] h-[28px] overflow-hidden border border-black/10 transition-all duration-300 group-hover:border-brand-gold/30 flex-shrink-0"
-                        >
-                          <img
-                            src={c.image}
-                            alt={c.name}
-                            className="w-full h-full object-cover"
-                          />
+                        {/* Name + specs */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className={`font-serif text-[17px] leading-tight transition-colors ${isOpen ? 'text-brand-gold-dark' : 'text-brand-charcoal group-hover:text-brand-gold-dark'}`}>
+                              {ser.name}
+                            </span>
+                            {ser.badge && (
+                              <span className="text-[7.5px] uppercase tracking-[0.18em] font-bold px-2 py-0.5 bg-brand-gold/10 text-brand-gold-dark border border-brand-gold/15">
+                                {ser.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-brand-muted font-sans leading-none">
+                            {ser.profile.split('·')[0].trim()}
+                            <span className="mx-1.5 opacity-30">·</span>
+                            <span className="font-bold text-brand-charcoal/60">{ser.warranty}</span>
+                            <span className="mx-1.5 opacity-30">·</span>
+                            <span className="text-brand-gold-dark">{ser.colours.length} finishes</span>
+                          </p>
                         </div>
-                      ))}
-                      {s.colours.length > 6 && (
-                        <span className="text-[9px] font-bold text-brand-muted font-sans ml-1">
-                          +{s.colours.length - 6}
-                        </span>
-                      )}
-                    </div>
 
-                    {/* Arrow */}
-                    <ArrowRight
-                      size={13}
-                      className="text-brand-muted/40 group-hover:text-brand-gold-dark transition-all duration-300 group-hover:translate-x-1 shrink-0"
-                    />
-                  </Link>
-                ))}
+                        {/* Chevron */}
+                        <ChevronDown
+                          size={14}
+                          className={`text-brand-muted/40 transition-all duration-300 shrink-0 ${isOpen ? 'rotate-180 text-brand-gold-dark' : 'group-hover:text-brand-charcoal'}`}
+                        />
+                      </button>
+
+                      {/* ── Expanded colour panel ── */}
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.div
+                            key="panel"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <div className="pb-6 pt-1">
+                              <div className="flex flex-wrap gap-2">
+                                {ser.colours.map((c) => (
+                                  <div key={c.name} className="flex flex-col items-center gap-1">
+                                    <div
+                                      title={c.name}
+                                      className="w-[80px] h-[40px] overflow-hidden border border-black/10 hover:border-brand-gold/40 transition-colors"
+                                    >
+                                      <img
+                                        src={c.image}
+                                        alt={c.name}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                    <span className="text-[8px] text-brand-muted font-sans text-center leading-tight w-[80px] truncate">
+                                      {c.name}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                              <Link
+                                to={ser.route}
+                                className="inline-flex items-center gap-1.5 mt-5 text-[9px] uppercase tracking-widest font-bold text-brand-gold-dark hover:text-brand-charcoal transition-colors border-b border-brand-gold/30 pb-0.5"
+                              >
+                                Explore Full Series <ArrowRight size={10} />
+                              </Link>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
               </div>
             </BlurReveal>
           </div>
