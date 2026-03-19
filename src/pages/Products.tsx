@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   ShieldCheck, Droplets, Flame, Leaf,
   ArrowRight, Phone, MessageCircle, MapPin,
-  CheckCircle2, Layers, BadgeCheck, Zap, ChevronRight,
+  CheckCircle2, Layers, BadgeCheck, Zap, ChevronRight, ChevronDown,
 } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -212,9 +212,9 @@ const authenticityMarkers = [
 ];
 
 const trimmingProfiles = [
-  { name: 'Profile A', dims: '4" x 4"', desc: 'Standard perimeter profile for wall-to-ceiling transitions. Available in all series colours.' },
-  { name: 'Profile B', dims: '2" x 2"', desc: 'Internal corner profile for direction changes. Precision-milled for a tight, gap-free joint.' },
-  { name: 'Profile C', dims: '3" x 1"', desc: 'Slim step-down profile for exposed panel edges and reveals at architectural junctions.' },
+  { name: 'Profile A', dims: '4" × 4"', slug: 'profile-a-4-4', image: IMG.lightNatural, desc: 'Standard perimeter profile for wall-to-ceiling transitions. Available in all series colours.' },
+  { name: 'Profile B', dims: '2" × 2"', slug: 'profile-b-2-2', image: IMG.darkEbony,   desc: 'Internal corner profile for direction changes. Precision-milled for a tight, gap-free joint.' },
+  { name: 'Profile C', dims: '3" × 1"', slug: 'profile-c-3-1', image: IMG.warmTeak,    desc: 'Slim step-down profile for exposed panel edges and reveals at architectural junctions.' },
 ];
 
 // ─── Badge component ──────────────────────────────────────────────────────────
@@ -444,6 +444,8 @@ function SeriesSection({ s, isReversed }: { s: SeriesData; isReversed: boolean }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export function ProductsPage() {
+  const [expandedSeries, setExpandedSeries] = useState<string | null>(null);
+
   return (
     <div className="bg-brand-surface min-h-screen text-brand-charcoal font-sans overflow-x-hidden">
       <Navbar />
@@ -562,68 +564,95 @@ export function ProductsPage() {
 
             <BlurReveal delay={0.2}>
               <div className="divide-y divide-black/5">
-                {allSeries.map((s) => (
-                  <Link
-                    key={s.id}
-                    to={s.route}
-                    className="group relative flex items-center gap-5 py-5 transition-all duration-300"
-                  >
-                    {/* Gold left accent on hover */}
-                    <div className="absolute -left-5 top-0 h-full w-[2px] bg-brand-gold scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-top rounded-full" />
+                {allSeries.map((ser) => {
+                  const isOpen = expandedSeries === ser.id;
+                  return (
+                    <div key={ser.id}>
+                      {/* ── Row header (clickable) ── */}
+                      <button
+                        onClick={() => setExpandedSeries(isOpen ? null : ser.id)}
+                        className="group relative w-full flex items-center gap-5 py-5 text-left transition-all duration-300"
+                      >
+                        {/* Gold left accent on expand */}
+                        <div className={`absolute -left-5 top-0 h-full w-[2px] bg-brand-gold transition-transform duration-300 origin-top rounded-full ${isOpen ? 'scale-y-100' : 'scale-y-0 group-hover:scale-y-100'}`} />
 
-                    {/* Ghost series code */}
-                    <span className="font-serif text-4xl font-light text-black/[0.06] group-hover:text-brand-gold/20 transition-colors w-10 shrink-0 select-none leading-none">
-                      {s.code}
-                    </span>
-
-                    {/* Name + specs */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <span className="font-serif text-[17px] text-brand-charcoal group-hover:text-brand-gold-dark transition-colors leading-tight">
-                          {s.name}
+                        {/* Ghost series code */}
+                        <span className={`font-serif text-4xl font-light w-10 shrink-0 select-none leading-none transition-colors ${isOpen ? 'text-brand-gold/30' : 'text-black/[0.06] group-hover:text-brand-gold/20'}`}>
+                          {ser.code}
                         </span>
-                        {s.badge && (
-                          <span className="text-[7.5px] uppercase tracking-[0.18em] font-bold px-2 py-0.5 bg-brand-gold/10 text-brand-gold-dark border border-brand-gold/15">
-                            {s.badge}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[10px] text-brand-muted font-sans leading-none">
-                        {s.profile.split('·')[0].trim()}
-                        <span className="mx-1.5 opacity-30">·</span>
-                        <span className="font-bold text-brand-charcoal/60">{s.warranty}</span>
-                      </p>
-                    </div>
 
-                    {/* Colour texture box strip */}
-                    <div className="flex items-center gap-[3px] shrink-0">
-                      {s.colours.slice(0, 6).map((c) => (
-                        <div
-                          key={c.name}
-                          title={c.name}
-                          className="w-[22px] h-[28px] overflow-hidden border border-black/10 transition-all duration-300 group-hover:border-brand-gold/30 flex-shrink-0"
-                        >
-                          <img
-                            src={c.image}
-                            alt={c.name}
-                            className="w-full h-full object-cover"
-                          />
+                        {/* Name + specs */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className={`font-serif text-[17px] leading-tight transition-colors ${isOpen ? 'text-brand-gold-dark' : 'text-brand-charcoal group-hover:text-brand-gold-dark'}`}>
+                              {ser.name}
+                            </span>
+                            {ser.badge && (
+                              <span className="text-[7.5px] uppercase tracking-[0.18em] font-bold px-2 py-0.5 bg-brand-gold/10 text-brand-gold-dark border border-brand-gold/15">
+                                {ser.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-brand-muted font-sans leading-none">
+                            {ser.profile.split('·')[0].trim()}
+                            <span className="mx-1.5 opacity-30">·</span>
+                            <span className="font-bold text-brand-charcoal/60">{ser.warranty}</span>
+                            <span className="mx-1.5 opacity-30">·</span>
+                            <span className="text-brand-gold-dark">{ser.colours.length} finishes</span>
+                          </p>
                         </div>
-                      ))}
-                      {s.colours.length > 6 && (
-                        <span className="text-[9px] font-bold text-brand-muted font-sans ml-1">
-                          +{s.colours.length - 6}
-                        </span>
-                      )}
-                    </div>
 
-                    {/* Arrow */}
-                    <ArrowRight
-                      size={13}
-                      className="text-brand-muted/40 group-hover:text-brand-gold-dark transition-all duration-300 group-hover:translate-x-1 shrink-0"
-                    />
-                  </Link>
-                ))}
+                        {/* Chevron */}
+                        <ChevronDown
+                          size={14}
+                          className={`text-brand-muted/40 transition-all duration-300 shrink-0 ${isOpen ? 'rotate-180 text-brand-gold-dark' : 'group-hover:text-brand-charcoal'}`}
+                        />
+                      </button>
+
+                      {/* ── Expanded colour panel ── */}
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.div
+                            key="panel"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <div className="pb-6 pt-1">
+                              <div className="flex flex-wrap gap-2">
+                                {ser.colours.map((c) => (
+                                  <div key={c.name} className="flex flex-col items-center gap-1">
+                                    <div
+                                      title={c.name}
+                                      className="w-[80px] h-[40px] overflow-hidden border border-black/10 hover:border-brand-gold/40 transition-colors"
+                                    >
+                                      <img
+                                        src={c.image}
+                                        alt={c.name}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                    <span className="text-[8px] text-brand-muted font-sans text-center leading-tight w-[80px] truncate">
+                                      {c.name}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                              <Link
+                                to={ser.route}
+                                className="inline-flex items-center gap-1.5 mt-5 text-[9px] uppercase tracking-widest font-bold text-brand-gold-dark hover:text-brand-charcoal transition-colors border-b border-brand-gold/30 pb-0.5"
+                              >
+                                Explore Full Series <ArrowRight size={10} />
+                              </Link>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
               </div>
             </BlurReveal>
           </div>
@@ -669,20 +698,60 @@ export function ProductsPage() {
               Every i-Panel installation requires a matching finishing profile. These precision-engineered trims create clean transitions at every edge and corner.
             </p>
           </BlurReveal>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             {trimmingProfiles.map((p, i) => (
               <BlurReveal key={p.name} delay={0.1 * i}>
-                <div className="group p-10 border border-black/5 bg-brand-surface hover:bg-white hover:shadow-[0_12px_50px_rgba(0,0,0,0.07)] hover:border-brand-gold/20 transition-all duration-500">
-                  <div className="w-14 h-14 flex items-center justify-center mb-8 text-2xl font-serif font-bold border border-black/5 group-hover:border-brand-gold/30 bg-brand-gold/10 text-brand-gold-dark transition-colors">
-                    {p.name.split(' ')[1]}
+                <Link
+                  to={`/products/finishing-series/${p.slug}`}
+                  className="group block border border-black/5 bg-white hover:border-brand-gold/30 hover:shadow-[0_20px_60px_rgba(197,160,89,0.12)] transition-all duration-500 overflow-hidden"
+                >
+                  {/* Image */}
+                  <div className="relative h-52 overflow-hidden">
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                    {/* Dims badge */}
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-brand-gold-dark text-white text-[9px] uppercase tracking-widest font-bold font-sans px-3 py-1.5">
+                        {p.dims}
+                      </span>
+                    </div>
+                    {/* Profile letter */}
+                    <div className="absolute bottom-4 right-4 w-10 h-10 flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 text-white text-lg font-serif font-bold">
+                      {p.name.split(' ')[1]}
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-serif font-medium text-brand-charcoal mb-1 group-hover:text-brand-gold-dark transition-colors">{p.name}</h3>
-                  <p className="text-[9px] uppercase tracking-widest font-bold mb-5 text-brand-gold-dark">{p.dims}</p>
-                  <p className="text-sm text-brand-muted font-light leading-relaxed">{p.desc}</p>
-                </div>
+                  {/* Content */}
+                  <div className="p-8">
+                    <h3 className="text-xl font-serif font-medium text-brand-charcoal mb-3 group-hover:text-brand-gold-dark transition-colors">{p.name}</h3>
+                    <p className="text-sm text-brand-muted font-light leading-relaxed mb-6">{p.desc}</p>
+                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-brand-charcoal group-hover:text-brand-gold-dark group-hover:gap-3 transition-all duration-300">
+                      View Profile <ArrowRight size={11} />
+                    </div>
+                  </div>
+                </Link>
               </BlurReveal>
             ))}
           </div>
+
+          {/* CTA to finishing series hub */}
+          <BlurReveal delay={0.35}>
+            <div className="flex items-center justify-between border border-black/5 bg-brand-surface px-8 py-6">
+              <div>
+                <p className="text-sm font-serif text-brand-charcoal mb-0.5">20 colour finishes. 5-year warranty.</p>
+                <p className="text-xs text-brand-muted font-light">All three profiles available in every colour across every series.</p>
+              </div>
+              <Link
+                to="/products/finishing-series"
+                className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-brand-gold-dark hover:text-brand-charcoal border-b border-brand-gold/40 pb-0.5 whitespace-nowrap transition-colors"
+              >
+                Explore Finishing Series <ArrowRight size={11} />
+              </Link>
+            </div>
+          </BlurReveal>
         </div>
       </section>
 
