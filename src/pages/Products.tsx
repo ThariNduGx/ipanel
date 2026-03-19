@@ -212,9 +212,9 @@ const authenticityMarkers = [
 ];
 
 const trimmingProfiles = [
-  { name: 'Profile A', dims: '4" x 4"', desc: 'Standard perimeter profile for wall-to-ceiling transitions. Available in all series colours.' },
-  { name: 'Profile B', dims: '2" x 2"', desc: 'Internal corner profile for direction changes. Precision-milled for a tight, gap-free joint.' },
-  { name: 'Profile C', dims: '3" x 1"', desc: 'Slim step-down profile for exposed panel edges and reveals at architectural junctions.' },
+  { name: 'Profile A', dims: '4" × 4"', slug: 'profile-a-4-4', image: IMG.lightNatural, desc: 'Standard perimeter profile for wall-to-ceiling transitions. Available in all series colours.' },
+  { name: 'Profile B', dims: '2" × 2"', slug: 'profile-b-2-2', image: IMG.darkEbony,   desc: 'Internal corner profile for direction changes. Precision-milled for a tight, gap-free joint.' },
+  { name: 'Profile C', dims: '3" × 1"', slug: 'profile-c-3-1', image: IMG.warmTeak,    desc: 'Slim step-down profile for exposed panel edges and reveals at architectural junctions.' },
 ];
 
 // ─── Badge component ──────────────────────────────────────────────────────────
@@ -698,20 +698,60 @@ export function ProductsPage() {
               Every i-Panel installation requires a matching finishing profile. These precision-engineered trims create clean transitions at every edge and corner.
             </p>
           </BlurReveal>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             {trimmingProfiles.map((p, i) => (
               <BlurReveal key={p.name} delay={0.1 * i}>
-                <div className="group p-10 border border-black/5 bg-brand-surface hover:bg-white hover:shadow-[0_12px_50px_rgba(0,0,0,0.07)] hover:border-brand-gold/20 transition-all duration-500">
-                  <div className="w-14 h-14 flex items-center justify-center mb-8 text-2xl font-serif font-bold border border-black/5 group-hover:border-brand-gold/30 bg-brand-gold/10 text-brand-gold-dark transition-colors">
-                    {p.name.split(' ')[1]}
+                <Link
+                  to={`/products/finishing-series/${p.slug}`}
+                  className="group block border border-black/5 bg-white hover:border-brand-gold/30 hover:shadow-[0_20px_60px_rgba(197,160,89,0.12)] transition-all duration-500 overflow-hidden"
+                >
+                  {/* Image */}
+                  <div className="relative h-52 overflow-hidden">
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                    {/* Dims badge */}
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-brand-gold-dark text-white text-[9px] uppercase tracking-widest font-bold font-sans px-3 py-1.5">
+                        {p.dims}
+                      </span>
+                    </div>
+                    {/* Profile letter */}
+                    <div className="absolute bottom-4 right-4 w-10 h-10 flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 text-white text-lg font-serif font-bold">
+                      {p.name.split(' ')[1]}
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-serif font-medium text-brand-charcoal mb-1 group-hover:text-brand-gold-dark transition-colors">{p.name}</h3>
-                  <p className="text-[9px] uppercase tracking-widest font-bold mb-5 text-brand-gold-dark">{p.dims}</p>
-                  <p className="text-sm text-brand-muted font-light leading-relaxed">{p.desc}</p>
-                </div>
+                  {/* Content */}
+                  <div className="p-8">
+                    <h3 className="text-xl font-serif font-medium text-brand-charcoal mb-3 group-hover:text-brand-gold-dark transition-colors">{p.name}</h3>
+                    <p className="text-sm text-brand-muted font-light leading-relaxed mb-6">{p.desc}</p>
+                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-brand-charcoal group-hover:text-brand-gold-dark group-hover:gap-3 transition-all duration-300">
+                      View Profile <ArrowRight size={11} />
+                    </div>
+                  </div>
+                </Link>
               </BlurReveal>
             ))}
           </div>
+
+          {/* CTA to finishing series hub */}
+          <BlurReveal delay={0.35}>
+            <div className="flex items-center justify-between border border-black/5 bg-brand-surface px-8 py-6">
+              <div>
+                <p className="text-sm font-serif text-brand-charcoal mb-0.5">20 colour finishes. 5-year warranty.</p>
+                <p className="text-xs text-brand-muted font-light">All three profiles available in every colour across every series.</p>
+              </div>
+              <Link
+                to="/products/finishing-series"
+                className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-brand-gold-dark hover:text-brand-charcoal border-b border-brand-gold/40 pb-0.5 whitespace-nowrap transition-colors"
+              >
+                Explore Finishing Series <ArrowRight size={11} />
+              </Link>
+            </div>
+          </BlurReveal>
         </div>
       </section>
 
