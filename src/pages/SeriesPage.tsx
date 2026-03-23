@@ -51,6 +51,14 @@ function BentoColourCard({ colour, index }: { colour: ColourSpec; index: number 
           <ArrowRight size={13} className="text-white" />
         </div>
 
+        {/* Hover CTA strip */}
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-5 py-3.5 bg-brand-charcoal/85 backdrop-blur-md translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
+          <span className="text-white text-[10px] uppercase tracking-wider font-bold font-sans">View Colour</span>
+          <div className="w-7 h-7 rounded-full bg-white/15 border border-white/25 flex items-center justify-center">
+            <ArrowRight size={12} className="text-white" />
+          </div>
+        </div>
+
         {/* Badge */}
         <div className="absolute top-4 left-4">
           <span className="bg-white/15 backdrop-blur-sm border border-white/20 text-white text-[8px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-full">

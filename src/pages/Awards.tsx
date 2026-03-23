@@ -44,7 +44,7 @@ export function Awards() {
         {/* Hero */}
         <section className="relative h-[50vh] min-h-[360px] flex items-center justify-center overflow-hidden bg-brand-charcoal">
           <div className="absolute inset-0 opacity-10"
-            style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, #C5A059 0%, transparent 60%), radial-gradient(circle at 70% 50%, #C5A059 0%, transparent 60%)' }}
+            style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, #0047FF 0%, transparent 60%), radial-gradient(circle at 70% 50%, #0047FF 0%, transparent 60%)' }}
           />
           <div className="relative z-10 text-center text-white px-6 max-w-3xl mx-auto">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="mb-4">

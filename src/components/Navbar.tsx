@@ -85,7 +85,7 @@ export function Navbar() {
             to="/"
             className="font-serif font-medium text-xl text-brand-charcoal tracking-tight px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors mr-1"
           >
-            i<span className="text-[#3B82F6]">-</span>Panel<sup className="text-[9px]">®</sup>
+            i<span className="text-[#0047FF]">-</span>Panel<sup className="text-[9px]">®</sup>
           </Link>
 
           {/* Divider */}
@@ -228,7 +228,7 @@ export function Navbar() {
           {/* CTA */}
           <Link
             to="/get-a-quote"
-            className="px-5 py-2.5 rounded-full bg-[#3B82F6] text-white text-[11px] uppercase tracking-wider font-bold hover:bg-[#2563EB] transition-all duration-200 shadow-[0_4px_14px_rgba(59,130,246,0.35)] hover:shadow-[0_4px_20px_rgba(59,130,246,0.5)]"
+            className="px-5 py-2.5 rounded-full bg-[#0047FF] text-white text-[11px] uppercase tracking-wider font-bold hover:bg-[#0035CC] transition-all duration-200 shadow-[0_4px_14px_rgba(0,71,255,0.35)] hover:shadow-[0_4px_20px_rgba(0,71,255,0.5)]"
           >
             Technical Quote
           </Link>
@@ -245,7 +245,7 @@ export function Navbar() {
       >
         <div className="container mx-auto px-6 flex items-center justify-between h-16">
           <Link to="/" className="font-serif font-medium text-xl text-brand-charcoal tracking-tight">
-            i<span className="text-[#3B82F6]">-</span>Panel<sup className="text-[9px]">®</sup>
+            i<span className="text-[#0047FF]">-</span>Panel<sup className="text-[9px]">®</sup>
           </Link>
           <div className="flex items-center gap-2">
             <button
@@ -329,7 +329,7 @@ export function Navbar() {
               <Link
                 to="/get-a-quote"
                 onClick={() => setMenuOpen(false)}
-                className="w-full text-center block px-5 py-3 rounded-full bg-[#3B82F6] text-white text-[11px] uppercase tracking-wider font-bold shadow-[0_4px_14px_rgba(59,130,246,0.3)]"
+                className="w-full text-center block px-5 py-3 rounded-full bg-[#0047FF] text-white text-[11px] uppercase tracking-wider font-bold shadow-[0_4px_14px_rgba(0,71,255,0.3)]"
               >
                 Technical Quote
               </Link>

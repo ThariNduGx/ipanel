@@ -145,7 +145,7 @@ export const SERIES: SeriesSpec[] = [
       { cm: '305', label: '305 cm (10 ft)' },
       { cm: '366', label: '366 cm (12 ft)' },
     ],
-    prices: { '305': 2800, '366': 3200 },
+    prices: { '305': 2276, '366': 2726 },
     coveragePerPanel: { '305': 0.915, '366': 1.098 },
     colors: [
       'Matt White', 'Solid Fabric', 'Silver Line', 'Black Line',
@@ -167,7 +167,7 @@ export const SERIES: SeriesSpec[] = [
       { cm: '305', label: '305 cm (10 ft)' },
       { cm: '366', label: '366 cm (12 ft)' },
     ],
-    prices: { '305': 3200, '366': 3700 },
+    prices: { '305': 1767.5, '366': 2117.5 },
     coveragePerPanel: { '305': 0.61, '366': 0.732 },
     colors: [
       'Matt White', 'Solid Fabric', 'Silver Line', 'Black Line',
@@ -190,7 +190,7 @@ export const SERIES: SeriesSpec[] = [
       { cm: '305', label: '305 cm (10 ft)' },
       { cm: '366', label: '366 cm (12 ft)' },
     ],
-    prices: { '305': 3400, '366': 3900 },
+    prices: { '305': 1767.5, '366': 2117.5 },
     coveragePerPanel: { '305': 0.61, '366': 0.732 },
     colors: [
       'Matt White', 'Solid Fabric', 'White Wood', 'Gray Wood',
@@ -206,5 +206,9 @@ export function getSeriesById(id: string): SeriesSpec | undefined {
 }
 
 export function formatPrice(amount: number): string {
-  return `LKR ${amount.toLocaleString('en-LK')}`;
+  const hasDecimals = amount % 1 !== 0;
+  return `LKR ${amount.toLocaleString('en-LK', {
+    minimumFractionDigits: hasDecimals ? 2 : 0,
+    maximumFractionDigits: 2,
+  })}`;
 }

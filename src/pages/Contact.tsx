@@ -24,7 +24,7 @@ export function Contact() {
         {/* Hero */}
         <section className="relative bg-brand-charcoal py-32 px-6 text-center overflow-hidden">
           <div className="absolute inset-0 opacity-5"
-            style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #C5A059 0%, transparent 70%)' }}
+            style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #0047FF 0%, transparent 70%)' }}
           />
           <motion.p
             initial={{ opacity: 0 }}

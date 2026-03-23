@@ -223,7 +223,7 @@ function Badge({ variant, children }: { variant: SeriesData['badgeVariant']; chi
     gold:  'bg-brand-gold-dark text-white',
     red:   'bg-red-600 text-white',
     green: 'bg-emerald-600 text-white',
-    blue:  'bg-[#3B82F6] text-white',
+    blue:  'bg-[#0047FF] text-white',
   }[variant];
   return (
     <span className={`px-3 py-1.5 text-[8px] font-bold font-sans uppercase tracking-[0.15em] ${cls}`}>
@@ -476,7 +476,7 @@ export function ProductsPage() {
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-serif font-medium mb-8 leading-[1.08] tracking-tight text-brand-charcoal max-w-4xl">
               UPVC Ceiling and Wall Panels:
               <br />
-              <span className="italic font-light" style={{ background: 'linear-gradient(135deg,#C5A059,#E2C792)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              <span className="italic font-light" style={{ background: 'linear-gradient(135deg,#0035CC,#6B9EFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                 The i-Panel Collection.
               </span>
             </h1>
@@ -861,7 +861,7 @@ export function ProductsPage() {
                 <div className="relative z-10 p-12 text-white">
                   <p className="text-[9px] uppercase tracking-[0.3em] font-bold font-sans text-brand-gold/70 mb-8">Environmental Impact</p>
                   <div className="mb-10">
-                    <span className="text-7xl font-serif font-medium tracking-tight" style={{ background: 'linear-gradient(135deg,#C5A059,#E2C792)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>1,875</span>
+                    <span className="text-7xl font-serif font-medium tracking-tight" style={{ background: 'linear-gradient(135deg,#0035CC,#6B9EFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>1,875</span>
                     <p className="text-white/70 font-light mt-2 text-base">trees saved every single month</p>
                   </div>
                   <div className="space-y-3 text-sm font-light text-white/75 border-t border-white/10 pt-8">

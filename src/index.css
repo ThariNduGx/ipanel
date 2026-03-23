@@ -13,9 +13,9 @@
   --color-brand-muted: #6B7280;
 
   /* Accents */
-  --color-brand-gold: #C5A059;
-  --color-brand-gold-light: #E2C792;
-  --color-brand-gold-dark: #A68444;
+  --color-brand-gold: #0047FF;
+  --color-brand-gold-light: #6B9EFF;
+  --color-brand-gold-dark: #0035CC;
 }
 
 body {
@@ -38,7 +38,7 @@ h6 {
 
 /* Custom selection */
 ::selection {
-  background-color: var(--color-brand-gold);
+  background-color: #0047FF;
   color: white;
 }
 
@@ -73,8 +73,11 @@ h6 {
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, var(--color-brand-gold) 0%, var(--color-brand-gold-light) 100%);
+  background: linear-gradient(135deg, #0035CC 0%, #6B9EFF 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+.scrollbar-hide { scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }

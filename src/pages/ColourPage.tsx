@@ -1,7 +1,7 @@
-import { Link, useParams, Navigate } from 'react-router-dom';
+import { Link, useParams, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
-import { motion, useInView } from 'motion/react';
-import { ArrowRight, ChevronRight, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check } from 'lucide-react';
+import { motion, useInView, AnimatePresence } from 'motion/react';
+import { ArrowRight, ChevronRight, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check, Calculator, ChevronDown } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { CartSidebar } from '../components/CartSidebar';
@@ -136,12 +136,22 @@ export function ColourPage() {
 
   // ── Cart / purchase state ──
   const { addItem } = useCart();
+  const navigate = useNavigate();
   const shopSeries = SERIES.find((s) => s.id === (DATA_KEY_TO_SERIES_ID[dataKey] ?? dataKey));
   const [selectedLength, setSelectedLength] = useState<LengthOption>(
     shopSeries?.lengths[0]?.cm ?? '305'
   );
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+
+  // ── Sticky bar ──
+  const purchasePanelRef = useRef<HTMLElement>(null);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+
+  // ── Panel estimator ──
+  const [showEstimator, setShowEstimator] = useState(false);
+  const [roomL, setRoomL] = useState('');
+  const [roomW, setRoomW] = useState('');
 
   function handleAddToCart() {
     if (!shopSeries || !colour) return;
@@ -162,7 +172,36 @@ export function ColourPage() {
     setTimeout(() => setAdded(false), 2500);
   }
 
+  function handleBuyNow() {
+    if (!shopSeries || !colour) return;
+    const swatchHex = COLOR_SWATCHES[colour.name] ?? '#C8C8C8';
+    const price = shopSeries.prices[selectedLength] ?? 0;
+    addItem({
+      cartKey: `${shopSeries.id}-${colour.name}-${selectedLength}`,
+      seriesId: shopSeries.id,
+      seriesName: shopSeries.name,
+      colorName: colour.name,
+      colorSwatch: swatchHex,
+      selectedLength,
+      lengthLabel: shopSeries.lengths.find((l) => l.cm === selectedLength)?.label ?? `${selectedLength}cm`,
+      quantity,
+      pricePerPiece: price,
+    });
+    navigate('/cart');
+  }
+
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
+
+  useEffect(() => {
+    const el = purchasePanelRef.current;
+    if (!el || !shopSeries) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyBar(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [shopSeries, slug]);
 
   if (!colour || colour.series !== dataKey) {
     return <Navigate to={`/products/${series ?? 'ipanel-lite'}`} replace />;
@@ -174,6 +213,19 @@ export function ColourPage() {
   const otherColours = seriesColours.filter((c) => c.slug !== colour.slug).slice(0, 4);
 
   const price = shopSeries ? (shopSeries.prices[selectedLength] ?? 0) : 0;
+
+  // ── WhatsApp URL ──
+  const waMessage = colour
+    ? encodeURIComponent(`Hi, I'm interested in the ${colour.name} (${colour.seriesLabel}) panels. Please share pricing and availability.`)
+    : '';
+  const waUrl = `https://wa.me/94722002200?text=${waMessage}`;
+
+  // ── Panel estimator ──
+  const coverage = shopSeries?.coveragePerPanel[selectedLength] ?? null;
+  const estimatedPanels =
+    coverage && roomL && roomW
+      ? Math.ceil((parseFloat(roomL) * parseFloat(roomW)) / (coverage as number) * 1.10)
+      : null;
 
   return (
     <div className="min-h-screen bg-brand-surface">
@@ -250,6 +302,263 @@ export function ColourPage() {
         </div>
       </section>
 
+      {/* ── Purchase Panel — right after hero ── */}
+      {shopSeries && (
+        <section ref={purchasePanelRef} className="py-14 px-6 bg-white border-b border-black/5">
+          <div className="container mx-auto max-w-6xl">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="grid md:grid-cols-[1fr_1.1fr] rounded-3xl overflow-hidden border border-black/5 shadow-[0_8px_60px_rgba(0,0,0,0.07)]"
+            >
+              {/* Left — colour image */}
+              <div className="relative min-h-[340px] md:min-h-[480px] overflow-hidden bg-brand-surface">
+                <div className="absolute inset-0" style={{ backgroundColor: colour.thumbnailBg }} />
+                <img
+                  src={colour.image}
+                  alt={`${colour.name} ${colour.finish} ceiling panel`}
+                  className="absolute inset-0 w-full h-full object-cover opacity-85"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute top-5 left-5">
+                  <span className="bg-white/15 backdrop-blur-md border border-white/20 text-white text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full">
+                    {colour.techSpecs.warranty} Warranty
+                  </span>
+                </div>
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="inline-block bg-black/40 backdrop-blur-md border border-white/15 px-4 py-3 rounded-2xl">
+                    <p className="text-white/55 text-[9px] uppercase tracking-[0.2em] font-bold font-sans mb-0.5">{colour.seriesLabel}</p>
+                    <p className="text-white font-serif text-xl leading-tight">{colour.name}</p>
+                    <p className="text-white/55 text-[10px] font-sans mt-0.5 font-light">{colour.finish}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right — purchase controls */}
+              <div className="bg-white p-8 md:p-12 flex flex-col justify-center gap-6">
+                {/* Series + name */}
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-brand-gold-dark font-sans mb-1">{shopSeries.name}</p>
+                  <h2 className="text-3xl font-serif font-medium text-brand-charcoal leading-tight">{colour.name}</h2>
+                  <p className="text-brand-muted text-sm font-light mt-1">{shopSeries.subtitle}</p>
+                </div>
+
+                {/* Price */}
+                <div className="flex items-end gap-4">
+                  <div>
+                    <p className="font-serif text-4xl text-brand-charcoal tracking-tight">{formatPrice(price)}</p>
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-brand-muted mt-1">
+                      Per panel · {shopSeries.lengths.find((l) => l.cm === selectedLength)?.label}
+                    </p>
+                  </div>
+                  <span className="mb-1 text-[9px] bg-brand-surface border border-black/5 px-3 py-1.5 rounded-full font-bold text-brand-muted uppercase tracking-wider">
+                    {shopSeries.warranty}
+                  </span>
+                </div>
+
+                {/* Length selector */}
+                {shopSeries.lengths.length > 1 && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-2.5">Panel Length</p>
+                    <div className="flex gap-2">
+                      {shopSeries.lengths.map((l) => (
+                        <button
+                          key={l.cm}
+                          onClick={() => setSelectedLength(l.cm)}
+                          className={`flex-1 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-200 ${
+                            selectedLength === l.cm
+                              ? 'bg-brand-charcoal text-white border-brand-charcoal'
+                              : 'border-black/10 text-brand-muted hover:border-brand-charcoal/30 hover:text-brand-charcoal bg-brand-surface'
+                          }`}
+                        >
+                          {l.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Quantity */}
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-2.5">Quantity</p>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 bg-brand-surface border border-black/5 rounded-full px-3 py-2">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-brand-muted hover:text-brand-charcoal hover:bg-black/5 transition-all"
+                      >
+                        <Minus size={13} />
+                      </button>
+                      <span className="w-10 text-center font-bold text-brand-charcoal font-sans text-sm">{quantity}</span>
+                      <button
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-brand-muted hover:text-brand-charcoal hover:bg-black/5 transition-all"
+                      >
+                        <Plus size={13} />
+                      </button>
+                    </div>
+                    <span className="text-sm text-brand-muted font-sans font-light">{formatPrice(price * quantity)} total</span>
+                  </div>
+                </div>
+
+                {/* Panel Estimator */}
+                {coverage && (
+                  <div className="border border-black/8 rounded-2xl overflow-hidden">
+                    <button
+                      onClick={() => setShowEstimator(!showEstimator)}
+                      className="w-full flex items-center justify-between px-4 py-3 text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted hover:text-brand-charcoal transition-colors"
+                    >
+                      <span className="flex items-center gap-2"><Calculator size={13} /> How many panels do I need?</span>
+                      <ChevronDown size={13} className={`transition-transform duration-200 ${showEstimator ? 'rotate-180' : ''}`} />
+                    </button>
+                    <AnimatePresence>
+                      {showEstimator && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-4 pt-4 border-t border-black/5 bg-brand-surface">
+                            <div className="grid grid-cols-2 gap-3 mb-3">
+                              <div>
+                                <label className="text-[9px] uppercase tracking-wider font-bold text-brand-muted block mb-1">Length (m)</label>
+                                <input
+                                  type="number" step="0.1" min="0" value={roomL}
+                                  onChange={e => setRoomL(e.target.value)}
+                                  placeholder="e.g. 4.5"
+                                  className="w-full px-3 py-2 rounded-xl border border-black/10 text-sm font-sans bg-white focus:outline-none focus:border-brand-gold-dark"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[9px] uppercase tracking-wider font-bold text-brand-muted block mb-1">Width (m)</label>
+                                <input
+                                  type="number" step="0.1" min="0" value={roomW}
+                                  onChange={e => setRoomW(e.target.value)}
+                                  placeholder="e.g. 3.2"
+                                  className="w-full px-3 py-2 rounded-xl border border-black/10 text-sm font-sans bg-white focus:outline-none focus:border-brand-gold-dark"
+                                />
+                              </div>
+                            </div>
+                            {estimatedPanels && (
+                              <div className="flex items-center justify-between bg-white rounded-xl px-4 py-3 border border-black/5">
+                                <div>
+                                  <p className="text-brand-charcoal font-serif text-2xl font-medium">{estimatedPanels}</p>
+                                  <p className="text-[9px] uppercase tracking-wider font-bold text-brand-muted">panels (incl. 10% waste)</p>
+                                </div>
+                                <button
+                                  onClick={() => setQuantity(estimatedPanels)}
+                                  className="px-4 py-2 rounded-full bg-brand-charcoal text-white text-[10px] uppercase tracking-wider font-bold hover:bg-brand-gold-dark transition-all"
+                                >
+                                  Use This
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+
+                {/* CTAs */}
+                <div className="flex flex-col gap-3 pt-2">
+                  <button
+                    onClick={handleAddToCart}
+                    className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-[11px] uppercase tracking-[0.15em] font-bold transition-all duration-300 ${
+                      added
+                        ? 'bg-green-600 text-white shadow-[0_4px_20px_rgba(22,163,74,0.25)]'
+                        : 'bg-brand-charcoal text-white hover:bg-brand-gold-dark shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_24px_rgba(0,71,255,0.3)]'
+                    }`}
+                  >
+                    {added ? <><Check size={15} /> Added to Cart</> : <><ShoppingBag size={15} /> Add to Cart</>}
+                  </button>
+                  <button
+                    onClick={handleBuyNow}
+                    className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-brand-charcoal/15 text-brand-charcoal text-[11px] uppercase tracking-[0.15em] font-bold hover:border-brand-charcoal/40 hover:bg-brand-surface transition-all duration-300"
+                  >
+                    Buy Now <ArrowRight size={13} />
+                  </button>
+                  <a
+                    href={waUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-[11px] uppercase tracking-[0.15em] font-bold text-[#25D366] border border-[#25D366]/20 hover:bg-[#25D366]/5 transition-all duration-300"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 flex-shrink-0">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967c-.273-.099-.471-.148-.67.15c-.197.297-.767.966-.94 1.164c-.173.199-.347.223-.644.075c-.297-.15-1.255-.463-2.39-1.475c-.883-.788-1.48-1.761-1.653-2.059c-.173-.297-.018-.458.13-.606c.134-.133.298-.347.446-.52c.149-.174.198-.298.298-.497c.099-.198.05-.371-.025-.52c-.075-.149-.669-1.612-.916-2.207c-.242-.579-.487-.5-.669-.51c-.173-.008-.371-.01-.57-.01c-.198 0-.52.074-.792.372c-.272.297-1.04 1.016-1.04 2.479c0 1.462 1.065 2.875 1.213 3.074c.149.198 2.096 3.2 5.077 4.487c.709.306 1.262.489 1.694.625c.712.227 1.36.195 1.871.118c.571-.085 1.758-.719 2.006-1.413c.248-.694.248-1.289.173-1.413c-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214l-3.741.982l.998-3.648l-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884c2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    Order via WhatsApp
+                  </a>
+                </div>
+
+                {/* Trust row */}
+                <div className="grid grid-cols-4 gap-3 pt-4 border-t border-black/5">
+                  {[
+                    { icon: Shield, label: shopSeries.warranty },
+                    { icon: Droplets, label: '100% Waterproof' },
+                    { icon: Sun, label: 'UV-Stabilised' },
+                    { icon: Layers, label: colour.techSpecs.thickness },
+                  ].map((b) => {
+                    const Icon = b.icon;
+                    return (
+                      <div key={b.label} className="text-center">
+                        <Icon size={16} className="mx-auto mb-1.5 text-brand-charcoal/50" strokeWidth={1.5} />
+                        <p className="text-[9px] uppercase tracking-[0.05em] font-bold text-brand-muted leading-snug">{b.label}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Colour Rail ── */}
+      {seriesColours.length > 1 && (
+        <section className="py-8 px-6 bg-white border-b border-black/5">
+          <div className="container mx-auto max-w-6xl">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-muted font-sans">
+                {colour.seriesLabel} Colours
+              </p>
+              <Link
+                to={seriesPath}
+                className="text-[10px] uppercase tracking-wider font-bold text-brand-gold-dark hover:text-brand-gold transition-colors"
+              >
+                View All {seriesColours.length} →
+              </Link>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+              {seriesColours.map((c) => (
+                <Link
+                  key={c.slug}
+                  to={`/products/${DATA_KEY_TO_URL_SLUG[c.series] ?? c.series}/${c.slug}`}
+                  className="flex flex-col items-center gap-1.5 flex-shrink-0 group"
+                >
+                  <div
+                    className={`w-10 h-10 rounded-full border-2 transition-all duration-200 group-hover:scale-110 ${
+                      c.slug === colour.slug
+                        ? 'border-brand-gold-dark ring-2 ring-brand-gold-dark ring-offset-2 scale-110'
+                        : 'border-black/10 group-hover:border-brand-gold-dark/50'
+                    }`}
+                    style={{ backgroundColor: c.thumbnailBg }}
+                  />
+                  <span className={`text-[9px] font-bold uppercase tracking-wide text-center leading-tight max-w-[52px] truncate font-sans ${
+                    c.slug === colour.slug ? 'text-brand-charcoal' : 'text-brand-muted group-hover:text-brand-charcoal'
+                  }`}>
+                    {c.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Narrative Profile + Tech Specs */}
       <section className="py-28 px-6">
         <div className="container mx-auto max-w-6xl">
@@ -304,8 +613,8 @@ export function ColourPage() {
               </div>
 
               {/* Award Badge */}
-              <div className="mt-6 flex items-center gap-4 p-5 rounded-2xl bg-[#3B82F6]/8 border border-[#3B82F6]/15">
-                <div className="w-10 h-10 rounded-full bg-[#3B82F6] flex items-center justify-center text-white flex-shrink-0">
+              <div className="mt-6 flex items-center gap-4 p-5 rounded-2xl bg-[#0047FF]/8 border border-[#0047FF]/15">
+                <div className="w-10 h-10 rounded-full bg-[#0047FF] flex items-center justify-center text-white flex-shrink-0">
                   <Award size={18} strokeWidth={1.5} />
                 </div>
                 <div>
@@ -321,113 +630,6 @@ export function ColourPage() {
           </div>
         </div>
       </section>
-
-      {/* ── Purchase Widget (shown when shopProducts data exists for this series) ── */}
-      {shopSeries && (
-        <section className="py-16 px-6 border-t border-black/5 bg-white">
-          <div className="container mx-auto max-w-6xl">
-            <div className="grid md:grid-cols-2 gap-10 items-center">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-gold-dark font-sans mb-3">
-                  Order Panels
-                </p>
-                <h2 className="text-3xl font-serif font-medium text-brand-charcoal mb-2">
-                  {colour.name}
-                </h2>
-                <p className="text-brand-muted text-sm mb-6">{shopSeries.subtitle}</p>
-                <div className="flex items-end gap-4 mb-6">
-                  <div>
-                    <p className="font-serif text-4xl text-brand-charcoal">{formatPrice(price)}</p>
-                    <p className="text-[10px] uppercase tracking-wider font-bold text-brand-muted mt-1">
-                      Per panel · {shopSeries.lengths.find((l) => l.cm === selectedLength)?.label}
-                    </p>
-                  </div>
-                  <span className="text-[9px] bg-brand-surface px-3 py-1 rounded-full font-bold text-brand-muted">
-                    {shopSeries.warranty} Warranty
-                  </span>
-                </div>
-
-                {/* Length selector */}
-                {shopSeries.lengths.length > 1 && (
-                  <div className="mb-5">
-                    <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-2">Length</p>
-                    <div className="flex gap-2">
-                      {shopSeries.lengths.map((l) => (
-                        <button
-                          key={l.cm}
-                          onClick={() => setSelectedLength(l.cm)}
-                          className={`flex-1 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all ${
-                            selectedLength === l.cm
-                              ? 'bg-brand-charcoal text-white border-brand-charcoal'
-                              : 'border-black/10 text-brand-muted hover:border-brand-charcoal/30 hover:text-brand-charcoal'
-                          }`}
-                        >
-                          {l.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Quantity + Add to Cart */}
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="flex items-center gap-2 bg-brand-surface rounded-full px-3 py-2">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-brand-muted hover:text-brand-charcoal transition-colors"
-                    >
-                      <Minus size={12} />
-                    </button>
-                    <span className="w-8 text-center font-bold text-brand-charcoal">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-brand-muted hover:text-brand-charcoal transition-colors"
-                    >
-                      <Plus size={12} />
-                    </button>
-                  </div>
-                  <span className="text-sm text-brand-muted font-sans">{formatPrice(price * quantity)} total</span>
-                </div>
-
-                <button
-                  onClick={handleAddToCart}
-                  className={`w-full flex items-center justify-center gap-2 py-4 rounded-full text-[11px] uppercase tracking-[0.15em] font-bold transition-all mb-3 ${
-                    added
-                      ? 'bg-green-600 text-white'
-                      : 'bg-brand-charcoal text-white hover:bg-brand-charcoal/90 shadow-[0_4px_20px_rgba(0,0,0,0.12)]'
-                  }`}
-                >
-                  {added ? <><Check size={15} /> Added to Cart</> : <><ShoppingBag size={15} /> Add to Cart</>}
-                </button>
-                <Link
-                  to="/get-a-quote"
-                  className="block w-full text-center py-3.5 rounded-full border border-black/10 text-brand-charcoal text-[11px] uppercase tracking-[0.15em] font-bold hover:border-brand-charcoal/30 transition-all"
-                >
-                  Request a Quote Instead
-                </Link>
-              </div>
-
-              {/* Trust badges */}
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { icon: Shield, label: shopSeries.warranty + ' Warranty' },
-                  { icon: Droplets, label: '100% Waterproof' },
-                  { icon: Sun, label: 'UV-Stabilised' },
-                  { icon: Layers, label: colour.techSpecs.thickness + ' Thick' },
-                ].map((b) => {
-                  const Icon = b.icon;
-                  return (
-                    <div key={b.label} className="bg-brand-surface rounded-2xl p-5 border border-black/5 text-center">
-                      <Icon size={20} className="mx-auto mb-2 text-brand-charcoal" strokeWidth={1.5} />
-                      <p className="text-[10px] uppercase tracking-[0.1em] font-bold text-brand-muted leading-snug">{b.label}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Interior Coordination Bento */}
       <section className="py-24 px-6 bg-brand-charcoal text-white">
@@ -534,6 +736,41 @@ export function ColourPage() {
       </section>
 
       <Footer />
+
+      {/* ── Sticky Add-to-Cart Bar ── */}
+      <AnimatePresence>
+        {shopSeries && showStickyBar && (
+          <motion.div
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed bottom-0 inset-x-0 z-50 bg-white/90 backdrop-blur-xl border-t border-black/8 shadow-[0_-8px_40px_rgba(0,0,0,0.1)]"
+          >
+            <div className="container mx-auto max-w-6xl px-6 py-3 flex items-center gap-4">
+              <div
+                className="w-10 h-10 rounded-full flex-shrink-0 border-2 border-black/10"
+                style={{ backgroundColor: colour.thumbnailBg }}
+              />
+              <div className="flex-1 min-w-0">
+                <p className="font-serif text-brand-charcoal font-medium truncate">{colour.name}</p>
+                <p className="text-[10px] uppercase tracking-wider text-brand-muted font-bold font-sans">
+                  {shopSeries.name} · {shopSeries.lengths.find(l => l.cm === selectedLength)?.label}
+                </p>
+              </div>
+              <p className="font-serif text-xl text-brand-charcoal hidden sm:block">{formatPrice(price)}</p>
+              <button
+                onClick={handleAddToCart}
+                className={`flex items-center gap-2 px-6 py-3 rounded-full text-[11px] uppercase tracking-[0.15em] font-bold transition-all duration-300 flex-shrink-0 ${
+                  added ? 'bg-green-600 text-white' : 'bg-brand-charcoal text-white hover:bg-brand-gold-dark'
+                }`}
+              >
+                {added ? <><Check size={13} /> Added</> : <><ShoppingBag size={13} /> Add to Cart</>}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

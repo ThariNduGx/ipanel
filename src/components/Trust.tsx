@@ -7,7 +7,7 @@ const achievements = [
     title: "Best Mobile User Experience",
     year: "2025",
     desc: "iPanel Wins Best Mobile User Experience Website at BestWeb.LK 2025, recognized for delivering an outstanding and intuitive digital experience.",
-    icon: <Smartphone className="text-[#3B82F6] w-8 h-8" strokeWidth={1.5} />,
+    icon: <Smartphone className="text-[#0047FF] w-8 h-8" strokeWidth={1.5} />,
     colSpan: "md:col-span-8 lg:col-span-8",
     featured: true
   },
@@ -39,7 +39,7 @@ const achievements = [
     title: "ISO 9001:2015 Quality",
     year: "2016",
     desc: "German Technology certification ensuring international quality standards.",
-    icon: <Trophy className="text-[#3B82F6]/70 w-8 h-8" strokeWidth={1.5} />,
+    icon: <Trophy className="text-[#0047FF]/70 w-8 h-8" strokeWidth={1.5} />,
     colSpan: "md:col-span-12 lg:col-span-4",
     featured: false
   }
@@ -50,7 +50,7 @@ export function Trust() {
     <section className="py-32 bg-brand-surface text-brand-charcoal relative overflow-hidden border-t border-black/5">
       {/* Abstract Luxury Background Elements */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 right-[-10%] w-[600px] h-[600px] bg-[#3B82F6]/5 blur-[150px] rounded-full mix-blend-multiply pointer-events-none" />
+        <div className="absolute top-0 right-[-10%] w-[600px] h-[600px] bg-[#0047FF]/5 blur-[150px] rounded-full mix-blend-multiply pointer-events-none" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-500/5 blur-[150px] rounded-full mix-blend-multiply pointer-events-none" />
         <div className="absolute top-[30%] left-[20%] w-[800px] h-[800px] bg-[radial-gradient(circle_at_center,rgba(197,160,89,0.06),transparent_50%)] z-10 pointer-events-none mix-blend-multiply" />
       </div>
@@ -63,7 +63,7 @@ export function Trust() {
         <div className="text-center max-w-3xl mx-auto mb-24">
           <BlurReveal>
             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-black/5 bg-white shadow-sm mb-8">
-              <Star className="w-3 h-3 text-[#3B82F6] fill-[#3B82F6]" />
+              <Star className="w-3 h-3 text-[#0047FF] fill-[#0047FF]" />
               <span className="text-brand-charcoal/80 text-[10px] uppercase font-sans tracking-[0.3em] font-bold">
                 Hall of Excellence
               </span>
@@ -104,18 +104,18 @@ export function Trust() {
                 `}
               >
                 {/* Hover Gradient Effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/0 via-transparent to-[#3B82F6]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0047FF]/0 via-transparent to-[#0047FF]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
                 <div className="relative z-10 flex flex-col h-full">
                   <div className="flex justify-between items-start mb-auto">
                     <div className="p-4 rounded-2xl bg-brand-surface shadow-sm border border-black/5 group-hover:scale-110 transition-transform duration-500 ease-out">
                       {/* Render icon, overriding text colors if necessary since icons have white/70 in data model */}
                       {React.cloneElement(item.icon as React.ReactElement, {
-                        className: `${(item.icon as any).props.className.replace('text-white/70', 'text-brand-muted').replace('text-[#3B82F6]/70', 'text-[#3B82F6]')} group-hover:text-brand-gold-dark transition-colors`
+                        className: `${(item.icon as any).props.className.replace('text-white/70', 'text-brand-muted').replace('text-[#0047FF]/70', 'text-[#0047FF]')} group-hover:text-brand-gold-dark transition-colors`
                       })}
                     </div>
                     {item.featured && (
-                      <span className="px-4 py-1.5 rounded-full bg-[#3B82F6]/10 border border-[#3B82F6]/20 text-[#3B82F6] text-[10px] font-bold uppercase tracking-widest font-sans group-hover:bg-[#3B82F6] group-hover:text-white transition-colors duration-500">
+                      <span className="px-4 py-1.5 rounded-full bg-[#0047FF]/10 border border-[#0047FF]/20 text-[#0047FF] text-[10px] font-bold uppercase tracking-widest font-sans group-hover:bg-[#0047FF] group-hover:text-white transition-colors duration-500">
                         Featured
                       </span>
                     )}
@@ -126,7 +126,7 @@ export function Trust() {
                       <span className="text-4xl md:text-5xl font-serif font-light text-brand-muted/30 group-hover:text-brand-muted/60 transition-colors duration-500">
                         {item.year}
                       </span>
-                      <div className="flex-grow h-[1px] bg-black/5 group-hover:bg-[#3B82F6]/30 transition-colors duration-500" />
+                      <div className="flex-grow h-[1px] bg-black/5 group-hover:bg-[#0047FF]/30 transition-colors duration-500" />
                     </div>
                     <h3 className={`font-sans font-medium text-brand-charcoal mb-3 ${item.featured ? 'text-2xl md:text-3xl lg:text-4xl' : 'text-xl md:text-2xl'}`}>
                       {item.title}
@@ -147,7 +147,7 @@ export function Trust() {
             <span className="text-brand-charcoal/50 text-xs font-mono uppercase tracking-[0.4em]">Official Partners & Certifications</span>
             <div className="flex gap-4">
               <BadgeCheck className="w-6 h-6 text-brand-charcoal" strokeWidth={1} />
-              <ShieldCheck className="w-6 h-6 text-[#3B82F6]" strokeWidth={1} />
+              <ShieldCheck className="w-6 h-6 text-[#0047FF]" strokeWidth={1} />
             </div>
           </div>
         </BlurReveal>
