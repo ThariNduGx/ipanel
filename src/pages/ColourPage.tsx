@@ -1,4 +1,4 @@
-import { Link, useParams, Navigate } from 'react-router-dom';
+import { Link, useParams, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'motion/react';
 import { ArrowRight, ChevronRight, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check } from 'lucide-react';
@@ -136,6 +136,7 @@ export function ColourPage() {
 
   // ── Cart / purchase state ──
   const { addItem } = useCart();
+  const navigate = useNavigate();
   const shopSeries = SERIES.find((s) => s.id === (DATA_KEY_TO_SERIES_ID[dataKey] ?? dataKey));
   const [selectedLength, setSelectedLength] = useState<LengthOption>(
     shopSeries?.lengths[0]?.cm ?? '305'
@@ -160,6 +161,24 @@ export function ColourPage() {
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
+  }
+
+  function handleBuyNow() {
+    if (!shopSeries || !colour) return;
+    const swatchHex = COLOR_SWATCHES[colour.name] ?? '#C8C8C8';
+    const price = shopSeries.prices[selectedLength] ?? 0;
+    addItem({
+      cartKey: `${shopSeries.id}-${colour.name}-${selectedLength}`,
+      seriesId: shopSeries.id,
+      seriesName: shopSeries.name,
+      colorName: colour.name,
+      colorSwatch: swatchHex,
+      selectedLength,
+      lengthLabel: shopSeries.lengths.find((l) => l.cm === selectedLength)?.label ?? `${selectedLength}cm`,
+      quantity,
+      pricePerPiece: price,
+    });
+    navigate('/cart');
   }
 
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
@@ -250,6 +269,149 @@ export function ColourPage() {
         </div>
       </section>
 
+      {/* ── Purchase Panel — right after hero ── */}
+      {shopSeries && (
+        <section className="py-14 px-6 bg-white border-b border-black/5">
+          <div className="container mx-auto max-w-6xl">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="grid md:grid-cols-[1fr_1.1fr] rounded-3xl overflow-hidden border border-black/5 shadow-[0_8px_60px_rgba(0,0,0,0.07)]"
+            >
+              {/* Left — colour image */}
+              <div className="relative min-h-[340px] md:min-h-[480px] overflow-hidden bg-brand-surface">
+                <div className="absolute inset-0" style={{ backgroundColor: colour.thumbnailBg }} />
+                <img
+                  src={colour.image}
+                  alt={`${colour.name} ${colour.finish} ceiling panel`}
+                  className="absolute inset-0 w-full h-full object-cover opacity-85"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute top-5 left-5">
+                  <span className="bg-white/15 backdrop-blur-md border border-white/20 text-white text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full">
+                    {colour.techSpecs.warranty} Warranty
+                  </span>
+                </div>
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="inline-block bg-black/40 backdrop-blur-md border border-white/15 px-4 py-3 rounded-2xl">
+                    <p className="text-white/55 text-[9px] uppercase tracking-[0.2em] font-bold font-sans mb-0.5">{colour.seriesLabel}</p>
+                    <p className="text-white font-serif text-xl leading-tight">{colour.name}</p>
+                    <p className="text-white/55 text-[10px] font-sans mt-0.5 font-light">{colour.finish}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right — purchase controls */}
+              <div className="bg-white p-8 md:p-12 flex flex-col justify-center gap-6">
+                {/* Series + name */}
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-brand-gold-dark font-sans mb-1">{shopSeries.name}</p>
+                  <h2 className="text-3xl font-serif font-medium text-brand-charcoal leading-tight">{colour.name}</h2>
+                  <p className="text-brand-muted text-sm font-light mt-1">{shopSeries.subtitle}</p>
+                </div>
+
+                {/* Price */}
+                <div className="flex items-end gap-4">
+                  <div>
+                    <p className="font-serif text-4xl text-brand-charcoal tracking-tight">{formatPrice(price)}</p>
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-brand-muted mt-1">
+                      Per panel · {shopSeries.lengths.find((l) => l.cm === selectedLength)?.label}
+                    </p>
+                  </div>
+                  <span className="mb-1 text-[9px] bg-brand-surface border border-black/5 px-3 py-1.5 rounded-full font-bold text-brand-muted uppercase tracking-wider">
+                    {shopSeries.warranty}
+                  </span>
+                </div>
+
+                {/* Length selector */}
+                {shopSeries.lengths.length > 1 && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-2.5">Panel Length</p>
+                    <div className="flex gap-2">
+                      {shopSeries.lengths.map((l) => (
+                        <button
+                          key={l.cm}
+                          onClick={() => setSelectedLength(l.cm)}
+                          className={`flex-1 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-200 ${
+                            selectedLength === l.cm
+                              ? 'bg-brand-charcoal text-white border-brand-charcoal'
+                              : 'border-black/10 text-brand-muted hover:border-brand-charcoal/30 hover:text-brand-charcoal bg-brand-surface'
+                          }`}
+                        >
+                          {l.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Quantity */}
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-2.5">Quantity</p>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 bg-brand-surface border border-black/5 rounded-full px-3 py-2">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-brand-muted hover:text-brand-charcoal hover:bg-black/5 transition-all"
+                      >
+                        <Minus size={13} />
+                      </button>
+                      <span className="w-10 text-center font-bold text-brand-charcoal font-sans text-sm">{quantity}</span>
+                      <button
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-brand-muted hover:text-brand-charcoal hover:bg-black/5 transition-all"
+                      >
+                        <Plus size={13} />
+                      </button>
+                    </div>
+                    <span className="text-sm text-brand-muted font-sans font-light">{formatPrice(price * quantity)} total</span>
+                  </div>
+                </div>
+
+                {/* CTAs */}
+                <div className="flex flex-col gap-3 pt-2">
+                  <button
+                    onClick={handleAddToCart}
+                    className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-[11px] uppercase tracking-[0.15em] font-bold transition-all duration-300 ${
+                      added
+                        ? 'bg-green-600 text-white shadow-[0_4px_20px_rgba(22,163,74,0.25)]'
+                        : 'bg-brand-charcoal text-white hover:bg-brand-gold-dark shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_24px_rgba(166,132,68,0.3)]'
+                    }`}
+                  >
+                    {added ? <><Check size={15} /> Added to Cart</> : <><ShoppingBag size={15} /> Add to Cart</>}
+                  </button>
+                  <button
+                    onClick={handleBuyNow}
+                    className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-brand-charcoal/15 text-brand-charcoal text-[11px] uppercase tracking-[0.15em] font-bold hover:border-brand-charcoal/40 hover:bg-brand-surface transition-all duration-300"
+                  >
+                    Buy Now <ArrowRight size={13} />
+                  </button>
+                </div>
+
+                {/* Trust row */}
+                <div className="grid grid-cols-4 gap-3 pt-4 border-t border-black/5">
+                  {[
+                    { icon: Shield, label: shopSeries.warranty },
+                    { icon: Droplets, label: '100% Waterproof' },
+                    { icon: Sun, label: 'UV-Stabilised' },
+                    { icon: Layers, label: colour.techSpecs.thickness },
+                  ].map((b) => {
+                    const Icon = b.icon;
+                    return (
+                      <div key={b.label} className="text-center">
+                        <Icon size={16} className="mx-auto mb-1.5 text-brand-charcoal/50" strokeWidth={1.5} />
+                        <p className="text-[9px] uppercase tracking-[0.05em] font-bold text-brand-muted leading-snug">{b.label}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
+
       {/* Narrative Profile + Tech Specs */}
       <section className="py-28 px-6">
         <div className="container mx-auto max-w-6xl">
@@ -321,113 +483,6 @@ export function ColourPage() {
           </div>
         </div>
       </section>
-
-      {/* ── Purchase Widget (shown when shopProducts data exists for this series) ── */}
-      {shopSeries && (
-        <section className="py-16 px-6 border-t border-black/5 bg-white">
-          <div className="container mx-auto max-w-6xl">
-            <div className="grid md:grid-cols-2 gap-10 items-center">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-gold-dark font-sans mb-3">
-                  Order Panels
-                </p>
-                <h2 className="text-3xl font-serif font-medium text-brand-charcoal mb-2">
-                  {colour.name}
-                </h2>
-                <p className="text-brand-muted text-sm mb-6">{shopSeries.subtitle}</p>
-                <div className="flex items-end gap-4 mb-6">
-                  <div>
-                    <p className="font-serif text-4xl text-brand-charcoal">{formatPrice(price)}</p>
-                    <p className="text-[10px] uppercase tracking-wider font-bold text-brand-muted mt-1">
-                      Per panel · {shopSeries.lengths.find((l) => l.cm === selectedLength)?.label}
-                    </p>
-                  </div>
-                  <span className="text-[9px] bg-brand-surface px-3 py-1 rounded-full font-bold text-brand-muted">
-                    {shopSeries.warranty} Warranty
-                  </span>
-                </div>
-
-                {/* Length selector */}
-                {shopSeries.lengths.length > 1 && (
-                  <div className="mb-5">
-                    <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted mb-2">Length</p>
-                    <div className="flex gap-2">
-                      {shopSeries.lengths.map((l) => (
-                        <button
-                          key={l.cm}
-                          onClick={() => setSelectedLength(l.cm)}
-                          className={`flex-1 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all ${
-                            selectedLength === l.cm
-                              ? 'bg-brand-charcoal text-white border-brand-charcoal'
-                              : 'border-black/10 text-brand-muted hover:border-brand-charcoal/30 hover:text-brand-charcoal'
-                          }`}
-                        >
-                          {l.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Quantity + Add to Cart */}
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="flex items-center gap-2 bg-brand-surface rounded-full px-3 py-2">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-brand-muted hover:text-brand-charcoal transition-colors"
-                    >
-                      <Minus size={12} />
-                    </button>
-                    <span className="w-8 text-center font-bold text-brand-charcoal">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-brand-muted hover:text-brand-charcoal transition-colors"
-                    >
-                      <Plus size={12} />
-                    </button>
-                  </div>
-                  <span className="text-sm text-brand-muted font-sans">{formatPrice(price * quantity)} total</span>
-                </div>
-
-                <button
-                  onClick={handleAddToCart}
-                  className={`w-full flex items-center justify-center gap-2 py-4 rounded-full text-[11px] uppercase tracking-[0.15em] font-bold transition-all mb-3 ${
-                    added
-                      ? 'bg-green-600 text-white'
-                      : 'bg-brand-charcoal text-white hover:bg-brand-charcoal/90 shadow-[0_4px_20px_rgba(0,0,0,0.12)]'
-                  }`}
-                >
-                  {added ? <><Check size={15} /> Added to Cart</> : <><ShoppingBag size={15} /> Add to Cart</>}
-                </button>
-                <Link
-                  to="/get-a-quote"
-                  className="block w-full text-center py-3.5 rounded-full border border-black/10 text-brand-charcoal text-[11px] uppercase tracking-[0.15em] font-bold hover:border-brand-charcoal/30 transition-all"
-                >
-                  Request a Quote Instead
-                </Link>
-              </div>
-
-              {/* Trust badges */}
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { icon: Shield, label: shopSeries.warranty + ' Warranty' },
-                  { icon: Droplets, label: '100% Waterproof' },
-                  { icon: Sun, label: 'UV-Stabilised' },
-                  { icon: Layers, label: colour.techSpecs.thickness + ' Thick' },
-                ].map((b) => {
-                  const Icon = b.icon;
-                  return (
-                    <div key={b.label} className="bg-brand-surface rounded-2xl p-5 border border-black/5 text-center">
-                      <Icon size={20} className="mx-auto mb-2 text-brand-charcoal" strokeWidth={1.5} />
-                      <p className="text-[10px] uppercase tracking-[0.1em] font-bold text-brand-muted leading-snug">{b.label}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Interior Coordination Bento */}
       <section className="py-24 px-6 bg-brand-charcoal text-white">
