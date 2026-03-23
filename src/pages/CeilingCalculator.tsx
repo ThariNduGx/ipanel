@@ -56,7 +56,7 @@ export function CeilingCalculator() {
         {/* Hero */}
         <section className="bg-brand-charcoal py-28 px-6 text-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-5"
-            style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #C5A059, transparent 70%)' }}
+            style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #0047FF, transparent 70%)' }}
           />
           <motion.div
             initial={{ opacity: 0 }}

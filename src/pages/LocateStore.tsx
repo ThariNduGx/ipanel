@@ -207,7 +207,7 @@ function ProvinceGroup({ province, index }: { province: typeof provinces[0]; ind
               <span
                 className={`text-[8px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
                   dealer.badge === 'Flagship'
-                    ? 'bg-[#3B82F6] text-white'
+                    ? 'bg-[#0047FF] text-white'
                     : 'bg-black/6 text-brand-muted'
                 }`}
               >
@@ -270,7 +270,7 @@ export function LocateStore() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-10 bg-[#3B82F6]/8 border border-[#3B82F6]/15 rounded-2xl p-6 max-w-2xl mx-auto text-center"
+            className="mt-10 bg-[#0047FF]/8 border border-[#0047FF]/15 rounded-2xl p-6 max-w-2xl mx-auto text-center"
           >
             <p className="text-brand-charcoal text-sm font-sans font-medium leading-relaxed">
               Purchasing from an unauthorised source voids the manufacturer warranty.

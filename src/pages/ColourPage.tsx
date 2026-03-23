@@ -1,7 +1,7 @@
 import { Link, useParams, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
-import { motion, useInView } from 'motion/react';
-import { ArrowRight, ChevronRight, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check } from 'lucide-react';
+import { motion, useInView, AnimatePresence } from 'motion/react';
+import { ArrowRight, ChevronRight, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check, Calculator, ChevronDown } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { CartSidebar } from '../components/CartSidebar';
@@ -144,6 +144,15 @@ export function ColourPage() {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
+  // ── Sticky bar ──
+  const purchasePanelRef = useRef<HTMLElement>(null);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+
+  // ── Panel estimator ──
+  const [showEstimator, setShowEstimator] = useState(false);
+  const [roomL, setRoomL] = useState('');
+  const [roomW, setRoomW] = useState('');
+
   function handleAddToCart() {
     if (!shopSeries || !colour) return;
     const swatchHex = COLOR_SWATCHES[colour.name] ?? '#C8C8C8';
@@ -183,6 +192,17 @@ export function ColourPage() {
 
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
 
+  useEffect(() => {
+    const el = purchasePanelRef.current;
+    if (!el || !shopSeries) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyBar(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [shopSeries, slug]);
+
   if (!colour || colour.series !== dataKey) {
     return <Navigate to={`/products/${series ?? 'ipanel-lite'}`} replace />;
   }
@@ -193,6 +213,19 @@ export function ColourPage() {
   const otherColours = seriesColours.filter((c) => c.slug !== colour.slug).slice(0, 4);
 
   const price = shopSeries ? (shopSeries.prices[selectedLength] ?? 0) : 0;
+
+  // ── WhatsApp URL ──
+  const waMessage = colour
+    ? encodeURIComponent(`Hi, I'm interested in the ${colour.name} (${colour.seriesLabel}) panels. Please share pricing and availability.`)
+    : '';
+  const waUrl = `https://wa.me/94722002200?text=${waMessage}`;
+
+  // ── Panel estimator ──
+  const coverage = shopSeries?.coveragePerPanel[selectedLength] ?? null;
+  const estimatedPanels =
+    coverage && roomL && roomW
+      ? Math.ceil((parseFloat(roomL) * parseFloat(roomW)) / (coverage as number) * 1.10)
+      : null;
 
   return (
     <div className="min-h-screen bg-brand-surface">
@@ -271,7 +304,7 @@ export function ColourPage() {
 
       {/* ── Purchase Panel — right after hero ── */}
       {shopSeries && (
-        <section className="py-14 px-6 bg-white border-b border-black/5">
+        <section ref={purchasePanelRef} className="py-14 px-6 bg-white border-b border-black/5">
           <div className="container mx-auto max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -369,6 +402,67 @@ export function ColourPage() {
                   </div>
                 </div>
 
+                {/* Panel Estimator */}
+                {coverage && (
+                  <div className="border border-black/8 rounded-2xl overflow-hidden">
+                    <button
+                      onClick={() => setShowEstimator(!showEstimator)}
+                      className="w-full flex items-center justify-between px-4 py-3 text-[10px] uppercase tracking-[0.15em] font-bold text-brand-muted hover:text-brand-charcoal transition-colors"
+                    >
+                      <span className="flex items-center gap-2"><Calculator size={13} /> How many panels do I need?</span>
+                      <ChevronDown size={13} className={`transition-transform duration-200 ${showEstimator ? 'rotate-180' : ''}`} />
+                    </button>
+                    <AnimatePresence>
+                      {showEstimator && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-4 pt-4 border-t border-black/5 bg-brand-surface">
+                            <div className="grid grid-cols-2 gap-3 mb-3">
+                              <div>
+                                <label className="text-[9px] uppercase tracking-wider font-bold text-brand-muted block mb-1">Length (m)</label>
+                                <input
+                                  type="number" step="0.1" min="0" value={roomL}
+                                  onChange={e => setRoomL(e.target.value)}
+                                  placeholder="e.g. 4.5"
+                                  className="w-full px-3 py-2 rounded-xl border border-black/10 text-sm font-sans bg-white focus:outline-none focus:border-brand-gold-dark"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[9px] uppercase tracking-wider font-bold text-brand-muted block mb-1">Width (m)</label>
+                                <input
+                                  type="number" step="0.1" min="0" value={roomW}
+                                  onChange={e => setRoomW(e.target.value)}
+                                  placeholder="e.g. 3.2"
+                                  className="w-full px-3 py-2 rounded-xl border border-black/10 text-sm font-sans bg-white focus:outline-none focus:border-brand-gold-dark"
+                                />
+                              </div>
+                            </div>
+                            {estimatedPanels && (
+                              <div className="flex items-center justify-between bg-white rounded-xl px-4 py-3 border border-black/5">
+                                <div>
+                                  <p className="text-brand-charcoal font-serif text-2xl font-medium">{estimatedPanels}</p>
+                                  <p className="text-[9px] uppercase tracking-wider font-bold text-brand-muted">panels (incl. 10% waste)</p>
+                                </div>
+                                <button
+                                  onClick={() => setQuantity(estimatedPanels)}
+                                  className="px-4 py-2 rounded-full bg-brand-charcoal text-white text-[10px] uppercase tracking-wider font-bold hover:bg-brand-gold-dark transition-all"
+                                >
+                                  Use This
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+
                 {/* CTAs */}
                 <div className="flex flex-col gap-3 pt-2">
                   <button
@@ -376,7 +470,7 @@ export function ColourPage() {
                     className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-[11px] uppercase tracking-[0.15em] font-bold transition-all duration-300 ${
                       added
                         ? 'bg-green-600 text-white shadow-[0_4px_20px_rgba(22,163,74,0.25)]'
-                        : 'bg-brand-charcoal text-white hover:bg-brand-gold-dark shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_24px_rgba(166,132,68,0.3)]'
+                        : 'bg-brand-charcoal text-white hover:bg-brand-gold-dark shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_24px_rgba(0,71,255,0.3)]'
                     }`}
                   >
                     {added ? <><Check size={15} /> Added to Cart</> : <><ShoppingBag size={15} /> Add to Cart</>}
@@ -387,6 +481,17 @@ export function ColourPage() {
                   >
                     Buy Now <ArrowRight size={13} />
                   </button>
+                  <a
+                    href={waUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-[11px] uppercase tracking-[0.15em] font-bold text-[#25D366] border border-[#25D366]/20 hover:bg-[#25D366]/5 transition-all duration-300"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 flex-shrink-0">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967c-.273-.099-.471-.148-.67.15c-.197.297-.767.966-.94 1.164c-.173.199-.347.223-.644.075c-.297-.15-1.255-.463-2.39-1.475c-.883-.788-1.48-1.761-1.653-2.059c-.173-.297-.018-.458.13-.606c.134-.133.298-.347.446-.52c.149-.174.198-.298.298-.497c.099-.198.05-.371-.025-.52c-.075-.149-.669-1.612-.916-2.207c-.242-.579-.487-.5-.669-.51c-.173-.008-.371-.01-.57-.01c-.198 0-.52.074-.792.372c-.272.297-1.04 1.016-1.04 2.479c0 1.462 1.065 2.875 1.213 3.074c.149.198 2.096 3.2 5.077 4.487c.709.306 1.262.489 1.694.625c.712.227 1.36.195 1.871.118c.571-.085 1.758-.719 2.006-1.413c.248-.694.248-1.289.173-1.413c-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214l-3.741.982l.998-3.648l-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884c2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    Order via WhatsApp
+                  </a>
                 </div>
 
                 {/* Trust row */}
@@ -408,6 +513,48 @@ export function ColourPage() {
                 </div>
               </div>
             </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Colour Rail ── */}
+      {seriesColours.length > 1 && (
+        <section className="py-8 px-6 bg-white border-b border-black/5">
+          <div className="container mx-auto max-w-6xl">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-muted font-sans">
+                {colour.seriesLabel} Colours
+              </p>
+              <Link
+                to={seriesPath}
+                className="text-[10px] uppercase tracking-wider font-bold text-brand-gold-dark hover:text-brand-gold transition-colors"
+              >
+                View All {seriesColours.length} →
+              </Link>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+              {seriesColours.map((c) => (
+                <Link
+                  key={c.slug}
+                  to={`/products/${DATA_KEY_TO_URL_SLUG[c.series] ?? c.series}/${c.slug}`}
+                  className="flex flex-col items-center gap-1.5 flex-shrink-0 group"
+                >
+                  <div
+                    className={`w-10 h-10 rounded-full border-2 transition-all duration-200 group-hover:scale-110 ${
+                      c.slug === colour.slug
+                        ? 'border-brand-gold-dark ring-2 ring-brand-gold-dark ring-offset-2 scale-110'
+                        : 'border-black/10 group-hover:border-brand-gold-dark/50'
+                    }`}
+                    style={{ backgroundColor: c.thumbnailBg }}
+                  />
+                  <span className={`text-[9px] font-bold uppercase tracking-wide text-center leading-tight max-w-[52px] truncate font-sans ${
+                    c.slug === colour.slug ? 'text-brand-charcoal' : 'text-brand-muted group-hover:text-brand-charcoal'
+                  }`}>
+                    {c.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -466,8 +613,8 @@ export function ColourPage() {
               </div>
 
               {/* Award Badge */}
-              <div className="mt-6 flex items-center gap-4 p-5 rounded-2xl bg-[#3B82F6]/8 border border-[#3B82F6]/15">
-                <div className="w-10 h-10 rounded-full bg-[#3B82F6] flex items-center justify-center text-white flex-shrink-0">
+              <div className="mt-6 flex items-center gap-4 p-5 rounded-2xl bg-[#0047FF]/8 border border-[#0047FF]/15">
+                <div className="w-10 h-10 rounded-full bg-[#0047FF] flex items-center justify-center text-white flex-shrink-0">
                   <Award size={18} strokeWidth={1.5} />
                 </div>
                 <div>
@@ -589,6 +736,41 @@ export function ColourPage() {
       </section>
 
       <Footer />
+
+      {/* ── Sticky Add-to-Cart Bar ── */}
+      <AnimatePresence>
+        {shopSeries && showStickyBar && (
+          <motion.div
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed bottom-0 inset-x-0 z-50 bg-white/90 backdrop-blur-xl border-t border-black/8 shadow-[0_-8px_40px_rgba(0,0,0,0.1)]"
+          >
+            <div className="container mx-auto max-w-6xl px-6 py-3 flex items-center gap-4">
+              <div
+                className="w-10 h-10 rounded-full flex-shrink-0 border-2 border-black/10"
+                style={{ backgroundColor: colour.thumbnailBg }}
+              />
+              <div className="flex-1 min-w-0">
+                <p className="font-serif text-brand-charcoal font-medium truncate">{colour.name}</p>
+                <p className="text-[10px] uppercase tracking-wider text-brand-muted font-bold font-sans">
+                  {shopSeries.name} · {shopSeries.lengths.find(l => l.cm === selectedLength)?.label}
+                </p>
+              </div>
+              <p className="font-serif text-xl text-brand-charcoal hidden sm:block">{formatPrice(price)}</p>
+              <button
+                onClick={handleAddToCart}
+                className={`flex items-center gap-2 px-6 py-3 rounded-full text-[11px] uppercase tracking-[0.15em] font-bold transition-all duration-300 flex-shrink-0 ${
+                  added ? 'bg-green-600 text-white' : 'bg-brand-charcoal text-white hover:bg-brand-gold-dark'
+                }`}
+              >
+                {added ? <><Check size={13} /> Added</> : <><ShoppingBag size={13} /> Add to Cart</>}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

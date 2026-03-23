@@ -205,8 +205,8 @@ export function Footer() {
               <h4 className="text-[10px] uppercase tracking-[0.2em] font-sans font-bold text-brand-gold-dark mb-4">
                 Recognition
               </h4>
-              <div className="inline-flex items-center gap-3 px-4 py-3 rounded-xl border border-brand-gold-dark/20 bg-[#3B82F6]/5 shadow-sm">
-                <div className="w-8 h-8 rounded-full bg-[#3B82F6] flex flex-shrink-0 items-center justify-center text-white shadow-sm">
+              <div className="inline-flex items-center gap-3 px-4 py-3 rounded-xl border border-brand-gold-dark/20 bg-[#0047FF]/5 shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-[#0047FF] flex flex-shrink-0 items-center justify-center text-white shadow-sm">
                   <Award size={16} strokeWidth={2} />
                 </div>
                 <span className="text-brand-charcoal text-xs font-bold font-sans">

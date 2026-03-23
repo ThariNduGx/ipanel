@@ -26,7 +26,7 @@ export function WarrantyActivation() {
       <div className="bg-brand-surface min-h-screen">
         <section className="bg-brand-charcoal py-24 px-6 text-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-5"
-            style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #C5A059, transparent 70%)' }}
+            style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #0047FF, transparent 70%)' }}
           />
           <div className="relative z-10">
             <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
