@@ -1,13 +1,42 @@
 import { Link, useParams, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, AnimatePresence } from 'motion/react';
-import { ArrowRight, ChevronRight, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check, Calculator, ChevronDown } from 'lucide-react';
+import { ArrowRight, ChevronRight, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check, Calculator, ChevronDown, Flame, Leaf, Paintbrush, Wrench, Feather, Home } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { CartSidebar } from '../components/CartSidebar';
 import { useCart } from '../context/CartContext';
 import { getColourBySlug, getColoursBySeriesSlug, URL_SLUG_TO_DATA_KEY, DATA_KEY_TO_URL_SLUG } from '../data/colours';
 import { SERIES, COLOR_SWATCHES, LengthOption, formatPrice } from '../data/shopProducts';
+
+// ── Static product data ──
+const keyBenefits = [
+  { icon: Flame,      label: 'Fire Retardant' },
+  { icon: Droplets,   label: 'Waterproof' },
+  { icon: Leaf,       label: 'Eco-Friendly & Recyclable' },
+  { icon: Paintbrush, label: 'Natural Wood Look' },
+  { icon: Layers,     label: 'Tongue & Groove System' },
+  { icon: Shield,     label: 'Insect & Mold Resistant' },
+  { icon: Wrench,     label: 'Low Maintenance' },
+  { icon: Feather,    label: 'Lightweight & Easy Install' },
+  { icon: Home,       label: 'Suitable for Any Interior' },
+  { icon: Award,      label: 'Long-Lasting Performance' },
+] as const;
+
+const productFeatures = [
+  'Waterproof',
+  'Anti Slip',
+  'Fire Retardant',
+  'Lightweight',
+  'Quiet & Soft Underfoot',
+  'Safety & Eco-Friendly',
+  'Realistic Natural Wood Designs',
+  'Super Wear Resistance',
+  'Easy & Quick Installation',
+  'Strong Pressure Bearing',
+  'Flexibility',
+  'Easy Maintenance',
+];
 
 /** Maps colours.ts internal keys → shopProducts.ts series ids */
 const DATA_KEY_TO_SERIES_ID: Record<string, string> = {
@@ -559,6 +588,33 @@ export function ColourPage() {
         </section>
       )}
 
+      {/* Key Benefits */}
+      <section className="py-20 px-6 bg-brand-surface border-b border-black/5">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-12">
+            <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-gold-dark font-sans mb-3">Why i-Panel</p>
+            <h2 className="text-3xl md:text-4xl font-serif font-medium text-brand-charcoal">Key Benefits</h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {keyBenefits.map(({ icon: Icon, label }, i) => (
+              <motion.div
+                key={label}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.4, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white border border-black/5 hover:border-brand-gold-dark/30 hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] transition-all duration-300 text-center group"
+              >
+                <div className="w-11 h-11 rounded-xl bg-brand-surface border border-black/5 flex items-center justify-center group-hover:bg-brand-gold-dark/10 group-hover:border-brand-gold-dark/20 transition-all duration-300">
+                  <Icon size={20} className="text-brand-charcoal/50 group-hover:text-brand-gold-dark transition-colors duration-300" strokeWidth={1.5} />
+                </div>
+                <p className="text-[10px] uppercase tracking-wider font-bold text-brand-muted group-hover:text-brand-charcoal transition-colors duration-300 leading-snug">{label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Narrative Profile + Tech Specs */}
       <section className="py-28 px-6">
         <div className="container mx-auto max-w-6xl">
@@ -626,6 +682,46 @@ export function ColourPage() {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Product Features */}
+      <section className="py-20 px-6 bg-white border-b border-black/5">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid md:grid-cols-[1fr_1.4fr] gap-12 lg:gap-20 items-center">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-gold-dark font-sans mb-3">What Sets It Apart</p>
+              <h2 className="text-3xl md:text-4xl font-serif font-medium text-brand-charcoal mb-6 leading-snug">Product Features</h2>
+              <p className="text-brand-muted font-light leading-relaxed text-sm">
+                Engineered for premium interiors, every i-Panel colour delivers the same specification-grade performance — built to withstand the rigour of professional installation and years of daily use.
+              </p>
+              <div className="mt-8 flex gap-3 flex-wrap">
+                <Link
+                  to="/get-a-quote"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand-charcoal text-white text-[10px] uppercase tracking-wider font-bold hover:bg-brand-gold-dark transition-all duration-300"
+                >
+                  Get a Quote <ArrowRight size={13} />
+                </Link>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {productFeatures.map((label, i) => (
+                <motion.div
+                  key={label}
+                  initial={{ opacity: 0, x: 12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-30px' }}
+                  transition={{ duration: 0.35, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex items-center gap-3 p-3.5 rounded-xl bg-brand-surface border border-black/5 hover:border-brand-gold-dark/25 hover:bg-white transition-all duration-200 group"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-brand-gold-dark/10 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-gold-dark/20 transition-colors duration-200">
+                    <Check size={13} className="text-brand-gold-dark" strokeWidth={2.5} />
+                  </div>
+                  <span className="text-[10px] uppercase tracking-wider font-bold text-brand-charcoal/70 group-hover:text-brand-charcoal transition-colors duration-200 leading-tight">{label}</span>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
