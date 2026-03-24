@@ -6,6 +6,7 @@ export interface ColourSpec {
   finish: string;
   description: string;
   image: string;
+  images?: string[];
   thumbnailBg: string;
   coordinates: string[];
   techSpecs: {

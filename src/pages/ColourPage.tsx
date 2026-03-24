@@ -1,7 +1,7 @@
 import { Link, useParams, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, AnimatePresence } from 'motion/react';
-import { ArrowRight, ChevronRight, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check, Calculator, ChevronDown, Flame, Leaf, Paintbrush, Wrench, Feather, Home } from 'lucide-react';
+import { ArrowRight, ChevronRight, ChevronLeft, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check, Calculator, ChevronDown, Flame, Leaf, Paintbrush, Wrench, Feather, Home } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { CartSidebar } from '../components/CartSidebar';
@@ -37,6 +37,26 @@ const productFeatures = [
   'Flexibility',
   'Easy Maintenance',
 ];
+
+/** Per-series lifestyle/ambient gallery images shown when a colour has no images[] array */
+const SERIES_GALLERY: Record<string, string[]> = {
+  'lite': [
+    'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=800&q=80',
+  ],
+  'heavy-b': [
+    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80',
+  ],
+  'heavy-f': [
+    'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80',
+  ],
+  'wall-cladding': [
+    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1615529182904-14819c35db37?auto=format&fit=crop&w=800&q=80',
+  ],
+};
 
 /** Maps colours.ts internal keys → shopProducts.ts series ids */
 const DATA_KEY_TO_SERIES_ID: Record<string, string> = {
@@ -172,6 +192,7 @@ export function ColourPage() {
   );
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [activeImg, setActiveImg] = useState(0);
 
   // ── Sticky bar ──
   const purchasePanelRef = useRef<HTMLElement>(null);
@@ -219,7 +240,7 @@ export function ColourPage() {
     navigate('/cart');
   }
 
-  useEffect(() => { window.scrollTo(0, 0); }, [slug]);
+  useEffect(() => { window.scrollTo(0, 0); setActiveImg(0); }, [slug]);
 
   useEffect(() => {
     const el = purchasePanelRef.current;
@@ -242,6 +263,11 @@ export function ColourPage() {
   const otherColours = seriesColours.filter((c) => c.slug !== colour.slug).slice(0, 4);
 
   const price = shopSeries ? (shopSeries.prices[selectedLength] ?? 0) : 0;
+
+  // ── Image gallery ──
+  const galleryImages = colour.images?.length
+    ? [colour.image, ...colour.images]
+    : [colour.image, ...(SERIES_GALLERY[colour.series] ?? [])];
 
   // ── WhatsApp URL ──
   const waMessage = colour
@@ -341,27 +367,85 @@ export function ColourPage() {
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="grid md:grid-cols-[1fr_1.1fr] rounded-3xl overflow-hidden border border-black/5 shadow-[0_8px_60px_rgba(0,0,0,0.07)]"
             >
-              {/* Left — colour image */}
-              <div className="relative min-h-[340px] md:min-h-[480px] overflow-hidden bg-brand-surface">
-                <div className="absolute inset-0" style={{ backgroundColor: colour.thumbnailBg }} />
-                <img
-                  src={colour.image}
-                  alt={`${colour.name} ${colour.finish} ceiling panel`}
-                  className="absolute inset-0 w-full h-full object-cover opacity-85"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute top-5 left-5">
-                  <span className="bg-white/15 backdrop-blur-md border border-white/20 text-white text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full">
-                    {colour.techSpecs.warranty} Warranty
-                  </span>
-                </div>
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="inline-block bg-black/40 backdrop-blur-md border border-white/15 px-4 py-3 rounded-2xl">
-                    <p className="text-white/55 text-[9px] uppercase tracking-[0.2em] font-bold font-sans mb-0.5">{colour.seriesLabel}</p>
-                    <p className="text-white font-serif text-xl leading-tight">{colour.name}</p>
-                    <p className="text-white/55 text-[10px] font-sans mt-0.5 font-light">{colour.finish}</p>
+              {/* Left — image gallery */}
+              <div className="relative overflow-hidden bg-brand-surface flex flex-col">
+                {/* Main display */}
+                <div className="relative flex-1 min-h-[300px] md:min-h-[420px]">
+                  <div className="absolute inset-0" style={{ backgroundColor: colour.thumbnailBg }} />
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={galleryImages[activeImg]}
+                      src={galleryImages[activeImg]}
+                      alt={`${colour.name} ${colour.finish} ceiling panel — view ${activeImg + 1}`}
+                      className="absolute inset-0 w-full h-full object-cover opacity-85"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.35 }}
+                    />
+                  </AnimatePresence>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+
+                  {/* Top row: warranty badge + counter */}
+                  <div className="absolute top-5 left-5 right-5 flex items-start justify-between">
+                    <span className="bg-white/15 backdrop-blur-md border border-white/20 text-white text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full">
+                      {colour.techSpecs.warranty} Warranty
+                    </span>
+                    {galleryImages.length > 1 && (
+                      <span className="bg-black/40 backdrop-blur-sm border border-white/15 text-white text-[9px] font-bold font-sans px-2.5 py-1 rounded-full">
+                        {activeImg + 1} / {galleryImages.length}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Prev / Next */}
+                  {galleryImages.length > 1 && (
+                    <>
+                      <button
+                        onClick={() => setActiveImg((i) => (i - 1 + galleryImages.length) % galleryImages.length)}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-black/60 transition-all duration-200 z-10"
+                        aria-label="Previous image"
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                      <button
+                        onClick={() => setActiveImg((i) => (i + 1) % galleryImages.length)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-black/60 transition-all duration-200 z-10"
+                        aria-label="Next image"
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </>
+                  )}
+
+                  {/* Colour info overlay */}
+                  <div className="absolute bottom-4 left-5 right-5">
+                    <div className="inline-block bg-black/40 backdrop-blur-md border border-white/15 px-4 py-3 rounded-2xl">
+                      <p className="text-white/55 text-[9px] uppercase tracking-[0.2em] font-bold font-sans mb-0.5">{colour.seriesLabel}</p>
+                      <p className="text-white font-serif text-xl leading-tight">{colour.name}</p>
+                      <p className="text-white/55 text-[10px] font-sans mt-0.5 font-light">{colour.finish}</p>
+                    </div>
                   </div>
                 </div>
+
+                {/* Thumbnail strip */}
+                {galleryImages.length > 1 && (
+                  <div className="flex gap-2 p-3 bg-white border-t border-black/5 overflow-x-auto scrollbar-hide flex-shrink-0">
+                    {galleryImages.map((src, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActiveImg(i)}
+                        className={`flex-shrink-0 w-[62px] h-[46px] rounded-lg overflow-hidden transition-all duration-200 ${
+                          i === activeImg
+                            ? 'ring-2 ring-brand-gold-dark ring-offset-1'
+                            : 'opacity-55 hover:opacity-80'
+                        }`}
+                      >
+                        <img src={src} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Right — purchase controls */}
@@ -681,6 +765,137 @@ export function ColourPage() {
                     Verified quality standard across all i-Panel finishes.
                   </p>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Technical Drawing */}
+      <section className="py-20 px-6 bg-brand-surface border-b border-black/5">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-12">
+            <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-gold-dark font-sans mb-3">Engineering Reference</p>
+            <h2 className="text-3xl font-serif font-medium text-brand-charcoal">Technical Drawing</h2>
+            <p className="text-brand-muted text-sm font-light mt-3 max-w-lg mx-auto">
+              Panel profile and dimensional specifications for the {colour.seriesLabel} system.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-[1.7fr_1fr] gap-8 items-start">
+            {/* SVG Drawing */}
+            <div className="bg-white rounded-3xl p-6 border border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.05)]">
+              <svg viewBox="0 0 660 336" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+                <defs>
+                  <pattern id="dotGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="10" cy="10" r="0.7" fill="#D1D5DB"/>
+                  </pattern>
+                </defs>
+
+                {/* Background */}
+                <rect width="660" height="336" rx="14" fill="#FAFAFA"/>
+                <rect width="660" height="336" rx="14" fill="url(#dotGrid)"/>
+                <rect x="1.5" y="1.5" width="657" height="333" rx="13" stroke="#E5E7EB" strokeWidth="1.5"/>
+
+                {/* ── FACE ELEVATION ── */}
+                <text x="50" y="26" fontSize="8" letterSpacing="2.5" fill="#9CA3AF" fontWeight="700" fontFamily="sans-serif">FACE ELEVATION</text>
+                {/* Panel face */}
+                <rect x="50" y="34" width="490" height="78" rx="2" fill={colour.thumbnailBg} opacity="0.9" stroke="#374151" strokeWidth="1.5"/>
+                {/* Grain lines */}
+                <line x1="50" y1="57"  x2="540" y2="57"  stroke="rgba(255,255,255,0.15)" strokeWidth="0.8"/>
+                <line x1="50" y1="73"  x2="540" y2="73"  stroke="rgba(255,255,255,0.15)" strokeWidth="0.8"/>
+                <line x1="50" y1="91"  x2="540" y2="91"  stroke="rgba(255,255,255,0.15)" strokeWidth="0.8"/>
+
+                {/* Width dim — left vertical */}
+                <line x1="22" y1="34"  x2="22" y2="112" stroke="#A87C2A" strokeWidth="1"/>
+                <line x1="16" y1="34"  x2="44" y2="34"  stroke="#A87C2A" strokeWidth="1"/>
+                <line x1="16" y1="112" x2="44" y2="112" stroke="#A87C2A" strokeWidth="1"/>
+                <g transform="translate(12,73) rotate(-90)">
+                  <text textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#A87C2A" fontFamily="sans-serif">{colour.techSpecs.width}</text>
+                </g>
+
+                {/* Length dim — bottom horizontal */}
+                <line x1="50"  y1="130" x2="540" y2="130" stroke="#A87C2A" strokeWidth="1"/>
+                <line x1="50"  y1="124" x2="50"  y2="136" stroke="#A87C2A" strokeWidth="1.5"/>
+                <line x1="540" y1="124" x2="540" y2="136" stroke="#A87C2A" strokeWidth="1.5"/>
+                <text x="295" y="148" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#A87C2A" fontFamily="sans-serif">{colour.techSpecs.length}</text>
+
+                {/* Section marker A-A */}
+                <line x1="562" y1="24" x2="562" y2="120" stroke="#374151" strokeWidth="1" strokeDasharray="5 3"/>
+                <circle cx="562" cy="24" r="9" fill="#374151"/>
+                <text x="562" y="28.5" textAnchor="middle" fontSize="8" fontWeight="700" fill="white" fontFamily="sans-serif">A</text>
+                <circle cx="562" cy="120" r="9" fill="#374151"/>
+                <text x="562" y="124.5" textAnchor="middle" fontSize="8" fontWeight="700" fill="white" fontFamily="sans-serif">A</text>
+
+                {/* ── CROSS SECTION A-A ── */}
+                <text x="50" y="182" fontSize="8" letterSpacing="2.5" fill="#9CA3AF" fontWeight="700" fontFamily="sans-serif">SECTION A-A  ·  PROFILE ENLARGED</text>
+
+                {/* Panel body */}
+                <rect x="100" y="194" width="380" height="44" rx="1" fill={colour.thumbnailBg} opacity="0.9" stroke="#374151" strokeWidth="1.5"/>
+                {/* Tongue (right) */}
+                <rect x="480" y="203" width="16" height="26" rx="1" fill={colour.thumbnailBg} opacity="0.9" stroke="#374151" strokeWidth="1.5"/>
+                {/* Groove (left — dashed) */}
+                <rect x="84" y="203" width="16" height="26" rx="1" fill="white" stroke="#374151" strokeWidth="1.2" strokeDasharray="3 2"/>
+
+                {/* Thickness dim — left */}
+                <line x1="62" y1="194" x2="62" y2="238" stroke="#A87C2A" strokeWidth="1"/>
+                <line x1="56" y1="194" x2="80" y2="194" stroke="#A87C2A" strokeWidth="1"/>
+                <line x1="56" y1="238" x2="80" y2="238" stroke="#A87C2A" strokeWidth="1"/>
+                <g transform="translate(50,216) rotate(-90)">
+                  <text textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#A87C2A" fontFamily="sans-serif">{colour.techSpecs.thickness}</text>
+                </g>
+
+                {/* Width dim — bottom */}
+                <line x1="100" y1="262" x2="480" y2="262" stroke="#A87C2A" strokeWidth="1"/>
+                <line x1="100" y1="256" x2="100" y2="268" stroke="#A87C2A" strokeWidth="1.5"/>
+                <line x1="480" y1="256" x2="480" y2="268" stroke="#A87C2A" strokeWidth="1.5"/>
+                <text x="290" y="280" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#A87C2A" fontFamily="sans-serif">{colour.techSpecs.width}</text>
+
+                {/* Callout: Tongue */}
+                <line x1="496" y1="216" x2="546" y2="203" stroke="#9CA3AF" strokeWidth="0.8"/>
+                <text x="550" y="203" fontSize="8.5" fill="#6B7280" fontFamily="sans-serif">Tongue</text>
+                {/* Callout: Groove */}
+                <line x1="84" y1="216" x2="45" y2="203" stroke="#9CA3AF" strokeWidth="0.8"/>
+                <text x="40" y="203" fontSize="8.5" fill="#6B7280" fontFamily="sans-serif" textAnchor="end">Groove</text>
+
+                {/* Footer note */}
+                <text x="330" y="316" textAnchor="middle" fontSize="8" fill="#9CA3AF" fontFamily="sans-serif">
+                  T&amp;G interlocking system · concealed installation · no visible fixings
+                </text>
+              </svg>
+            </div>
+
+            {/* Dimension callout panel */}
+            <div className="space-y-4">
+              <div className="bg-white rounded-2xl p-6 border border-black/5 shadow-[0_2px_16px_rgba(0,0,0,0.04)]">
+                <p className="text-[9px] uppercase tracking-[0.25em] font-bold text-brand-gold-dark font-sans mb-5">Key Dimensions</p>
+                {[
+                  { label: 'Panel Width',        value: colour.techSpecs.width },
+                  { label: 'Thickness',          value: colour.techSpecs.thickness },
+                  { label: 'Available Lengths',  value: colour.techSpecs.length },
+                  { label: 'Joint System',       value: 'Tongue & Groove' },
+                  { label: 'Installation',       value: 'Concealed fixing' },
+                  { label: 'Fire Rating',        value: colour.techSpecs.fireRating },
+                  { label: 'Moisture',           value: colour.techSpecs.moistureResistance },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex items-start justify-between py-3 border-b border-black/5 last:border-0">
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-brand-muted font-sans">{label}</span>
+                    <span className="text-brand-charcoal font-serif text-sm text-right max-w-[55%]">{value}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-brand-charcoal rounded-2xl p-5 text-white">
+                <p className="text-[9px] uppercase tracking-wider font-bold text-brand-gold-light font-sans mb-2">Need a DWG / DXF File?</p>
+                <p className="text-white/55 text-xs font-light leading-relaxed mb-4">
+                  Download the full CAD drawing package for specification and contractor use.
+                </p>
+                <Link
+                  to="/get-a-quote"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white text-[10px] uppercase tracking-wider font-bold hover:bg-white/20 transition-all duration-200"
+                >
+                  Request Drawing Pack <ArrowRight size={12} />
+                </Link>
               </div>
             </div>
           </div>
