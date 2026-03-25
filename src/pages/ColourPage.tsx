@@ -1,7 +1,7 @@
 import { Link, useParams, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, AnimatePresence } from 'motion/react';
-import { ArrowRight, ChevronRight, ChevronLeft, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check, Calculator, ChevronDown, Flame, Leaf, Paintbrush, Wrench, Feather, Home } from 'lucide-react';
+import { ArrowRight, ChevronRight, ChevronLeft, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check, Calculator, ChevronDown, Flame, Leaf, Paintbrush, Wrench, Feather, Home, Info } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { CartSidebar } from '../components/CartSidebar';
@@ -38,25 +38,45 @@ const productFeatures = [
   'Easy Maintenance',
 ];
 
-/** Per-series lifestyle/ambient gallery images shown when a colour has no images[] array */
-const SERIES_GALLERY: Record<string, string[]> = {
-  'lite': [
-    'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=800&q=80',
-  ],
-  'heavy-b': [
-    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80',
-  ],
-  'heavy-f': [
-    'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80',
-  ],
-  'wall-cladding': [
-    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1615529182904-14819c35db37?auto=format&fit=crop&w=800&q=80',
-  ],
-};
+const APPLICATIONS = [
+  {
+    tag: 'Master Bedroom',
+    caption: 'Ceiling as a design statement — overhead plane anchors a neutral palette without competing for attention.',
+    image: 'https://images.unsplash.com/photo-1560185008-b033106af5c3?auto=format&fit=crop&w=1200&q=80',
+    wide: true,
+  },
+  {
+    tag: 'Luxury Bathroom',
+    caption: '100% waterproof substrate — suitable for spa-style wet areas and high-humidity zones.',
+    image: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=800&q=80',
+    wide: false,
+  },
+  {
+    tag: 'Living Room',
+    caption: 'Continuous ceiling plane unifying an open-plan layout with no visible jointing.',
+    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80',
+    wide: false,
+  },
+  {
+    tag: 'Hotel Lobby',
+    caption: 'High-volume commercial installation using 4000mm long panels for minimum seams.',
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
+    wide: false,
+  },
+  {
+    tag: 'Home Office',
+    caption: 'Low-maintenance acoustic surface that reduces ambient noise for a focused work environment.',
+    image: 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=1200&q=80',
+    wide: true,
+  },
+];
+
+/** Neutral ambient images used as gallery fallback until per-colour images[] are populated.
+ *  These are architecture/texture shots with no visible panel colour — clearly contextual, not product. */
+const GALLERY_AMBIENT = [
+  'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
+];
 
 /** Maps colours.ts internal keys → shopProducts.ts series ids */
 const DATA_KEY_TO_SERIES_ID: Record<string, string> = {
@@ -265,9 +285,11 @@ export function ColourPage() {
   const price = shopSeries ? (shopSeries.prices[selectedLength] ?? 0) : 0;
 
   // ── Image gallery ──
-  const galleryImages = colour.images?.length
-    ? [colour.image, ...colour.images]
-    : [colour.image, ...(SERIES_GALLERY[colour.series] ?? [])];
+  // If per-colour images are provided use them; otherwise append neutral ambient shots as context.
+  const usingAmbientFallback = !colour.images?.length;
+  const galleryImages = usingAmbientFallback
+    ? [colour.image, ...GALLERY_AMBIENT]
+    : [colour.image, ...colour.images!];
 
   // ── WhatsApp URL ──
   const waMessage = colour
@@ -430,20 +452,27 @@ export function ColourPage() {
 
                 {/* Thumbnail strip */}
                 {galleryImages.length > 1 && (
-                  <div className="flex gap-2 p-3 bg-white border-t border-black/5 overflow-x-auto scrollbar-hide flex-shrink-0">
-                    {galleryImages.map((src, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setActiveImg(i)}
-                        className={`flex-shrink-0 w-[62px] h-[46px] rounded-lg overflow-hidden transition-all duration-200 ${
-                          i === activeImg
-                            ? 'ring-2 ring-brand-gold-dark ring-offset-1'
-                            : 'opacity-55 hover:opacity-80'
-                        }`}
-                      >
-                        <img src={src} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
-                      </button>
-                    ))}
+                  <div className="bg-white border-t border-black/5 flex-shrink-0">
+                    <div className="flex gap-2 p-3 overflow-x-auto scrollbar-hide">
+                      {galleryImages.map((src, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setActiveImg(i)}
+                          className={`flex-shrink-0 w-[62px] h-[46px] rounded-lg overflow-hidden transition-all duration-200 ${
+                            i === activeImg
+                              ? 'ring-2 ring-brand-gold-dark ring-offset-1'
+                              : 'opacity-55 hover:opacity-80'
+                          }`}
+                        >
+                          <img src={src} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                    {usingAmbientFallback && (
+                      <p className="text-[8.5px] text-brand-muted/50 text-center pb-2.5 px-3 font-sans leading-tight">
+                        Views 2–3 are lifestyle references · actual finish shown in view 1
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -939,6 +968,73 @@ export function ColourPage() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Applications Gallery */}
+      <section className="py-20 px-6 bg-brand-surface border-b border-black/5">
+        <div className="container mx-auto max-w-6xl">
+
+          {/* Header row */}
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-gold-dark font-sans mb-3">Where It Lives</p>
+              <h2 className="text-3xl md:text-4xl font-serif font-medium text-brand-charcoal">Installation Showcase</h2>
+            </div>
+            <span className="hidden sm:flex items-center gap-1.5 text-[9px] uppercase tracking-wider font-bold text-brand-muted/50 border border-black/8 px-3 py-1.5 rounded-full flex-shrink-0">
+              <Info size={10} strokeWidth={2} />
+              Inspiration images
+            </span>
+          </div>
+
+          {/* Bento grid — first item spans 2 cols */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {APPLICATIONS.map((app, i) => (
+              <motion.div
+                key={app.tag}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: i * 0.09, ease: [0.22, 1, 0.36, 1] }}
+                className={`relative overflow-hidden rounded-2xl group aspect-[4/3] ${
+                  i === 0 ? 'col-span-2' : ''
+                }`}
+              >
+                {/* Image */}
+                <img
+                  src={app.image}
+                  alt={`i-Panel installed in a ${app.tag.toLowerCase()} setting`}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+                />
+
+                {/* Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                {/* Application type badge */}
+                <div className="absolute top-4 left-4">
+                  <span className="bg-white/15 backdrop-blur-md border border-white/20 text-white text-[8px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-full">
+                    {app.tag}
+                  </span>
+                </div>
+
+                {/* Caption — slides up on hover */}
+                <div className="absolute inset-x-0 bottom-0 p-5">
+                  <p
+                    className={`text-white/90 font-sans leading-relaxed translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ${
+                      i === 0 ? 'text-sm max-w-lg' : 'text-xs'
+                    }`}
+                  >
+                    {app.caption}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Disclaimer */}
+          <p className="text-center text-[9px] text-brand-muted/45 mt-5 font-sans">
+            Images are installation references — actual appearance depends on the colour selected above
+          </p>
         </div>
       </section>
 
