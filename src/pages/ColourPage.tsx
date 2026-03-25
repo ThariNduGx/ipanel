@@ -38,25 +38,12 @@ const productFeatures = [
   'Easy Maintenance',
 ];
 
-/** Per-series lifestyle/ambient gallery images shown when a colour has no images[] array */
-const SERIES_GALLERY: Record<string, string[]> = {
-  'lite': [
-    'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=800&q=80',
-  ],
-  'heavy-b': [
-    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80',
-  ],
-  'heavy-f': [
-    'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80',
-  ],
-  'wall-cladding': [
-    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1615529182904-14819c35db37?auto=format&fit=crop&w=800&q=80',
-  ],
-};
+/** Neutral ambient images used as gallery fallback until per-colour images[] are populated.
+ *  These are architecture/texture shots with no visible panel colour — clearly contextual, not product. */
+const GALLERY_AMBIENT = [
+  'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
+];
 
 /** Maps colours.ts internal keys → shopProducts.ts series ids */
 const DATA_KEY_TO_SERIES_ID: Record<string, string> = {
@@ -265,9 +252,11 @@ export function ColourPage() {
   const price = shopSeries ? (shopSeries.prices[selectedLength] ?? 0) : 0;
 
   // ── Image gallery ──
-  const galleryImages = colour.images?.length
-    ? [colour.image, ...colour.images]
-    : [colour.image, ...(SERIES_GALLERY[colour.series] ?? [])];
+  // If per-colour images are provided use them; otherwise append neutral ambient shots as context.
+  const usingAmbientFallback = !colour.images?.length;
+  const galleryImages = usingAmbientFallback
+    ? [colour.image, ...GALLERY_AMBIENT]
+    : [colour.image, ...colour.images!];
 
   // ── WhatsApp URL ──
   const waMessage = colour
@@ -430,20 +419,27 @@ export function ColourPage() {
 
                 {/* Thumbnail strip */}
                 {galleryImages.length > 1 && (
-                  <div className="flex gap-2 p-3 bg-white border-t border-black/5 overflow-x-auto scrollbar-hide flex-shrink-0">
-                    {galleryImages.map((src, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setActiveImg(i)}
-                        className={`flex-shrink-0 w-[62px] h-[46px] rounded-lg overflow-hidden transition-all duration-200 ${
-                          i === activeImg
-                            ? 'ring-2 ring-brand-gold-dark ring-offset-1'
-                            : 'opacity-55 hover:opacity-80'
-                        }`}
-                      >
-                        <img src={src} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
-                      </button>
-                    ))}
+                  <div className="bg-white border-t border-black/5 flex-shrink-0">
+                    <div className="flex gap-2 p-3 overflow-x-auto scrollbar-hide">
+                      {galleryImages.map((src, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setActiveImg(i)}
+                          className={`flex-shrink-0 w-[62px] h-[46px] rounded-lg overflow-hidden transition-all duration-200 ${
+                            i === activeImg
+                              ? 'ring-2 ring-brand-gold-dark ring-offset-1'
+                              : 'opacity-55 hover:opacity-80'
+                          }`}
+                        >
+                          <img src={src} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                    {usingAmbientFallback && (
+                      <p className="text-[8.5px] text-brand-muted/50 text-center pb-2.5 px-3 font-sans leading-tight">
+                        Views 2–3 are lifestyle references · actual finish shown in view 1
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
