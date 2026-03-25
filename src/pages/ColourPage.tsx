@@ -1,7 +1,7 @@
 import { Link, useParams, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, AnimatePresence } from 'motion/react';
-import { ArrowRight, ChevronRight, ChevronLeft, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check, Calculator, ChevronDown, Flame, Leaf, Paintbrush, Wrench, Feather, Home, Info } from 'lucide-react';
+import { ArrowRight, ChevronRight, ChevronLeft, Shield, Droplets, Sun, Layers, Award, ShoppingBag, Plus, Minus, Check, Calculator, ChevronDown, Info } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { CartSidebar } from '../components/CartSidebar';
@@ -10,19 +10,6 @@ import { getColourBySlug, getColoursBySeriesSlug, URL_SLUG_TO_DATA_KEY, DATA_KEY
 import { SERIES, COLOR_SWATCHES, LengthOption, formatPrice } from '../data/shopProducts';
 
 // ── Static product data ──
-const keyBenefits = [
-  { icon: Flame,      label: 'Fire Retardant' },
-  { icon: Droplets,   label: 'Waterproof' },
-  { icon: Leaf,       label: 'Eco-Friendly & Recyclable' },
-  { icon: Paintbrush, label: 'Natural Wood Look' },
-  { icon: Layers,     label: 'Tongue & Groove System' },
-  { icon: Shield,     label: 'Insect & Mold Resistant' },
-  { icon: Wrench,     label: 'Low Maintenance' },
-  { icon: Feather,    label: 'Lightweight & Easy Install' },
-  { icon: Home,       label: 'Suitable for Any Interior' },
-  { icon: Award,      label: 'Long-Lasting Performance' },
-] as const;
-
 const productFeatures = [
   'Waterproof',
   'Anti Slip',
@@ -84,62 +71,6 @@ const DATA_KEY_TO_SERIES_ID: Record<string, string> = {
   'heavy-b': 'heavy-b',
   'heavy-f': 'i-series',
 };
-
-function ProfileCard({ profile, colourName, index }: { profile: { id: string; label: string; name: string; description: string; image: string }; colourName: string; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-40px' });
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 24, filter: 'blur(6px)' }}
-      animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
-      transition={{ duration: 0.5, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 hover:border-brand-gold-dark/40 transition-all duration-500 hover:-translate-y-1"
-    >
-      <div className="relative h-48 overflow-hidden">
-        <img
-          src={profile.image}
-          alt={`i-Panel ${profile.name} finishing profile for ${colourName} ceiling`}
-          className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60" />
-        <div className="absolute top-4 left-4">
-          <span className="bg-brand-gold-dark text-white text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full">
-            {profile.label}
-          </span>
-        </div>
-      </div>
-      <div className="p-6">
-        <h4 className="text-white font-serif text-lg mb-2">{profile.name}</h4>
-        <p className="text-white/50 text-[11px] font-sans font-light leading-relaxed">{profile.description}</p>
-      </div>
-    </motion.div>
-  );
-}
-
-const finishingProfiles = [
-  {
-    id: 'A',
-    label: 'Profile A — 4" × 4"',
-    name: 'Profile A',
-    description: '4" × 4" equal coverage on ceiling and wall face. For large rooms, high ceilings, and feature installations where a generous cornice presence is required.',
-    image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=400&q=80',
-  },
-  {
-    id: 'B',
-    label: 'Profile B — 2" × 2"',
-    name: 'Profile B',
-    description: '2" × 2" equal coverage. Standard residential — the most widely specified profile in the i-Panel range. Clean, proportionate, suitable for any ceiling height.',
-    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=400&q=80',
-  },
-  {
-    id: 'C',
-    label: 'Profile C — 3" × 1"',
-    name: 'Profile C',
-    description: 'Asymmetric — 3" on the ceiling face, 1" on the wall face. The only non-square profile in the range. For installations where wall intrusion must be minimal while ceiling presence is maintained.',
-    image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=400&q=80',
-  },
-];
 
 function CoordinatingCard({ slug, series, index }: { slug: string; series: string; index: number }) {
   const colour = getColourBySlug(slug);
@@ -701,33 +632,6 @@ export function ColourPage() {
         </section>
       )}
 
-      {/* Key Benefits */}
-      <section className="py-20 px-6 bg-brand-surface border-b border-black/5">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-12">
-            <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-gold-dark font-sans mb-3">Why i-Panel</p>
-            <h2 className="text-3xl md:text-4xl font-serif font-medium text-brand-charcoal">Key Benefits</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {keyBenefits.map(({ icon: Icon, label }, i) => (
-              <motion.div
-                key={label}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.4, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
-                className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white border border-black/5 hover:border-brand-gold-dark/30 hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] transition-all duration-300 text-center group"
-              >
-                <div className="w-11 h-11 rounded-xl bg-brand-surface border border-black/5 flex items-center justify-center group-hover:bg-brand-gold-dark/10 group-hover:border-brand-gold-dark/20 transition-all duration-300">
-                  <Icon size={20} className="text-brand-charcoal/50 group-hover:text-brand-gold-dark transition-colors duration-300" strokeWidth={1.5} />
-                </div>
-                <p className="text-[10px] uppercase tracking-wider font-bold text-brand-muted group-hover:text-brand-charcoal transition-colors duration-300 leading-snug">{label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Narrative Profile + Tech Specs */}
       <section className="py-28 px-6">
         <div className="container mx-auto max-w-6xl">
@@ -1054,25 +958,13 @@ export function ColourPage() {
           </div>
 
           {/* Coordinating Colours */}
-          <div className="mb-16">
+          <div>
             <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-gold-light font-sans mb-8">
               Coordinating Ceiling Finishes
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {colour.coordinates.map((slug, i) => (
                 <CoordinatingCard key={slug} slug={slug} series={colour.series} index={i} />
-              ))}
-            </div>
-          </div>
-
-          {/* Finishing Profiles */}
-          <div>
-            <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-gold-light font-sans mb-8">
-              Compatible Finishing Profiles
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {finishingProfiles.map((profile, i) => (
-                <ProfileCard key={profile.id} profile={profile} colourName={colour.name} index={i} />
               ))}
             </div>
           </div>
